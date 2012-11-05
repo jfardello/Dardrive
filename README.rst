@@ -22,7 +22,7 @@ from previous months as "historic" backups, you'll end up with a (time)
 configurable amount of incremental archives between full backups, plus
 "monthly" and "yearly" historic backups.
 
-Read the docs `here <http://jfardello.github.com/Dardrive/>_`.
+Read the docs `here <http://jfardello.github.com/Dardrive/>`_.
 
 .. _`s3ql`: http://code.google.com/p/s3ql/
 
