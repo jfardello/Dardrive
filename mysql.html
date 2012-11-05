@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MySQL integration &mdash; dardrive 0.2.9b3 documentation</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700|Anonymous+Pro' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.9b3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bootstrap.js"></script>
+    <script type="text/javascript" src="_static/overrides.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="dardrive 0.2.9b3 documentation" href="index.html" />
+    <link rel="next" title="Jobs file options" href="configopts.html" />
+    <link rel="prev" title="Basic concepts" href="concepts.html" /> 
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="container" id="toprow">
+            <div class="row">
+                <div class="span12">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html"><img
+                src="_static/img/hdd.png" alt="home">Dardrive</a>
+            <ul class="nav">
+      
+                <li class="dropdown">
+                    <a href="index.html" class="dropdown-toggle"
+                        data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu globaltoc" id="gtocmenu"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_commands.html">Dardrive Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Basic concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">MySQL integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configopts.html">Jobs file options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_restore.html">Manual recovery</a></li>
+</ul>
+</ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Sections <b class="caret"></b></a>
+                    <ul class="dropdown-menu localtoc" id="ltocmenu"><ul>
+<li><a class="reference internal" href="#">MySQL integration</a><ul>
+<li><a class="reference internal" href="#dumping-a-database">Dumping a database</a></li>
+<li><a class="reference internal" href="#restoring-a-database-dump">Restoring a database dump</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+                </li>
+               <li> <a title="Basic concepts" href="concepts.html">Prev</a></li>
+               <li> <a title="Jobs file options" href="configopts.html">Next</a></li>
+            </ul>
+            <ul class="nav pull-right">
+                      <li class="divider-vertical"></li>
+                      <li>
+                         <form class="navbar-search pull-left"
+                             action="search.html" method="GET">
+                            <input type="text" name="q" class="search-query span2" placeholder="Search">
+                        </form>
+                      </li>
+                    </ul>
+        </div>
+    </div>
+</div>
+                    <div class="documentwrapper">
+                        <div class="body">
+                            
+  <div class="section" id="mysql-integration">
+<h1>MySQL integration<a class="headerlink" href="#mysql-integration" title="Permalink to this headline">¶</a></h1>
+<p>Dardrive dumps all databases the MySQL user is able to access via mysql_dump.</p>
+<p>Mysql dumps are enabled by the boolean option <tt class="docutils literal"><span class="pre">mysql</span></tt>. Dumps are
+mysqldump output files in SQL format stored it in the archive_store, optionally
+compressed and encrypted. The <tt class="docutils literal"><span class="pre">mysql_compr</span></tt>, <tt class="docutils literal"><span class="pre">mysql_host</span></tt>, <tt class="docutils literal"><span class="pre">encryption</span></tt>
+<tt class="docutils literal"><span class="pre">mysql_user</span></tt> and <tt class="docutils literal"><span class="pre">mysql_password</span></tt> options may alter the resulting archive..</p>
+<p>When dumping a database, dardrive will pass the authentication credentials via
+a temporary file with the &#8220;&#8211;defaults-extra-file&#8221; mysqldump switch.</p>
+<p>If mysql_compr is defined dardrive will pipe the dump through gzip and will
+change the job type from dbdump to dbdump.gz.</p>
+<p>If encryption is set, the the password is extracted from the from the substring
+represening the password (the part that comes after the semicolon &#8221;:&#8221;),
+whatever the algorithm is set to, mysql encription is set to OpenSSL&#8217;s
+aes-256-cbc cipher, dardrive will create a temporary file fo storing that
+password and pipe the dump command through the openssl command.</p>
+<p>Database dumps behave much more as a filesystem jobs, they are affected by the
+<tt class="docutils literal"><span class="pre">par</span></tt>, <tt class="docutils literal"><span class="pre">par_redundancy</span></tt> options producing error correction archives, can be
+listed, its logs and time statistics are saved to the dardrive database, and
+they are rotated exactly as full filesystem jobs.</p>
+<div class="section" id="dumping-a-database">
+<h2>Dumping a database<a class="headerlink" href="#dumping-a-database" title="Permalink to this headline">¶</a></h2>
+<p>Add the mysql options that the job needs:</p>
+<div class="highlight-python"><pre>~/&gt;dardrive modjob -j myjob -O "mysq=yes" -O "mysq_user=user" -O \
+    mysql_password="pass"</pre>
+</div>
+<p>Perform a dump Job:</p>
+<div class="highlight-python"><pre>~/&gt;dardrive dbdump -j myjob</pre>
+</div>
+<p>List all the dbdumps available:</p>
+<div class="highlight-python"><pre>~/&gt;dardrive show archives -t dbdump -t dbdump.gz
+=================================================================================
+   catalog                             type                date            status
+=================================================================================
+09f376df703a4392978eeb9522c291c6   dbdump        2012-08-27 20:59:50.678357     0
+dfca7690fde74e1e8ed732d0f54dd0da   dbdump.gz     2012-08-27 20:58:46.559500     0</pre>
+</div>
+<p>The command show files -c catalog_id will return the locations os the dump
+files just as it does with filesystem jobs.</p>
+</div>
+<div class="section" id="restoring-a-database-dump">
+<h2>Restoring a database dump<a class="headerlink" href="#restoring-a-database-dump" title="Permalink to this headline">¶</a></h2>
+<p>Dardrive does not restores database jobs directly, instead, it outputs the dump
+in SQL format to a file or to standard output if the file name is set to &#8220;-&#8221;.</p>
+<p>It also tries to decrypt and decompress the archive if the propper options
+are set in the current job definition the archive belongs to.</p>
+<p class="alert alert-error"><strong>WARNING!</strong> If you change the encryption password of a job after a given
+dump is performed, then dar drive may fail to restore due to bad passwords,
+as it does not store previous passwords. If thats the case, see <em>manual
+recovery</em>. It is up to you to store old password information.</p>
+<p>In order to oputut the most recent dump of a job to stdout:</p>
+<div class="highlight-python"><pre>dardrive dbrestore -j jobname -f -</pre>
+</div>
+<p>Alternativelly you can restore an specific dump:</p>
+<div class="highlight-python"><pre>dardrive dbrestore -i 09f376df703a4392978eeb9522c291c6 -f /tmp/dump.sql</pre>
+</div>
+</div>
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="push"><!--//--></div>
+    </div>
+    <div class="footer container">
+        <div class="span12">
+              &copy; Copyright 
+              <span id="contact">2012, José Manuel Fardello. </span>
+              
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
+    </div>
+    </body>
+</html>

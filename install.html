@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing &mdash; dardrive 0.2.9b3 documentation</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700|Anonymous+Pro' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.9b3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bootstrap.js"></script>
+    <script type="text/javascript" src="_static/overrides.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="dardrive 0.2.9b3 documentation" href="index.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="For the impatient" href="index.html" /> 
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="container" id="toprow">
+            <div class="row">
+                <div class="span12">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html"><img
+                src="_static/img/hdd.png" alt="home">Dardrive</a>
+            <ul class="nav">
+      
+                <li class="dropdown">
+                    <a href="index.html" class="dropdown-toggle"
+                        data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu globaltoc" id="gtocmenu"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_commands.html">Dardrive Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Basic concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mysql.html">MySQL integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configopts.html">Jobs file options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_restore.html">Manual recovery</a></li>
+</ul>
+</ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Sections <b class="caret"></b></a>
+                    <ul class="dropdown-menu localtoc" id="ltocmenu"><ul>
+<li><a class="reference internal" href="#">Installing</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+                </li>
+               <li> <a title="For the impatient" href="index.html">Prev</a></li>
+               <li> <a title="Usage" href="usage.html">Next</a></li>
+            </ul>
+            <ul class="nav pull-right">
+                      <li class="divider-vertical"></li>
+                      <li>
+                         <form class="navbar-search pull-left"
+                             action="search.html" method="GET">
+                            <input type="text" name="q" class="search-query span2" placeholder="Search">
+                        </form>
+                      </li>
+                    </ul>
+        </div>
+    </div>
+</div>
+                    <div class="documentwrapper">
+                        <div class="body">
+                            
+  <div class="section" id="installing">
+<h1>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Dar 2.4.X</li>
+<li>Par2 (par2cmdline)</li>
+<li>OpenSSL</li>
+<li>Python 2.7, untested on other versions.</li>
+<li>An extended attributes enabled file system.</li>
+</ul>
+<p class="alert">If you plan to build par2cmdline from source, note that version 0.4 (2004-04-22)
+has some bugs that may crash par2 while running with -q (quiet mode), get a patched
+version.</p>
+</div>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>The code is hosted at <a class="reference external" href="http://github.com/jfardello/Dardrive">github</a> .</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">~/&gt;wget https://github.com/downloads/jfardello/Dardrive/dardrive-0.2.9b3.tar.gz</div>
+</div>
+<div class="line-block">
+<div class="line">~/&gt;tar xzf dardrive-0.2.9b3.tar.gz &amp;&amp; cd dardrive-0.2.9b3</div>
+</div>
+<div class="line-block">
+<div class="line">~/&gt;sudo python setup.py install</div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="push"><!--//--></div>
+    </div>
+    <div class="footer container">
+        <div class="span12">
+              &copy; Copyright 
+              <span id="contact">2012, José Manuel Fardello. </span>
+              
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
+    </div>
+    </body>
+</html>
