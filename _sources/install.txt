@@ -26,8 +26,8 @@ The code is hosted at `github <http://github.com/jfardello/Dardrive>`_ .
     
    | ~/>wget \https://github.com/downloads/jfardello/Dardrive/dardrive-|release|.tar.gz\
 
-   | ~/>tar xzf dardrive-|release|.tar.bz2 && cd dardrive-|release|
+   | ~/>tar xzf dardrive-|release|.tar.gz && cd dardrive-|release|
 
-   | ~/>python setup.py install
+   | ~/>sudo python setup.py install
 
 
