@@ -125,7 +125,7 @@ per job dar_manager database that dardrive mantains there.
 <p>Mysql backups are plain sql files that can be optionally encrypted, and compressed,
 you can guess that information from the job.cfg file, but an old backup could
 be produced with a different version of that cfg file.
-You can get information on how a backup was produces by examining the first
+You can get information on how a backup was produced by examining the first
 slice&#8217;s extended attributes:</p>
 <div class="highlight-python"><pre>&gt;getfattr &lt;filename&gt;.dmp.gz | grep enc
 getfattr: Removing leading '/' from absolute path names
@@ -133,7 +133,7 @@ user.dardrive.enc="True"</pre>
 </div>
 <p>The encryption for bd dumps is openssl&#8217;s aes cbc 256, and the  commpression can be
 deduced by the file extension, in this case:</p>
-<div class="highlight-python"><pre>&gt;zcat &lt;filename&gt;.dmp.gz | openssl enc -in %s -d -aes-256-cbc &gt; file.out</pre>
+<div class="highlight-python"><pre>&gt;zcat &lt;filename&gt;.dmp.gz | openssl enc -d -aes-256-cbc &gt; file.out</pre>
 </div>
 </div>
 </div>

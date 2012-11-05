@@ -52,7 +52,7 @@ Mysql restoring
 Mysql backups are plain sql files that can be optionally encrypted, and compressed,
 you can guess that information from the job.cfg file, but an old backup could
 be produced with a different version of that cfg file.
-You can get information on how a backup was produces by examining the first
+You can get information on how a backup was produced by examining the first
 slice's extended attributes::
     
     >getfattr <filename>.dmp.gz | grep enc
@@ -62,6 +62,6 @@ slice's extended attributes::
 The encryption for bd dumps is openssl's aes cbc 256, and the  commpression can be
 deduced by the file extension, in this case::
 
-    >zcat <filename>.dmp.gz | openssl enc -in %s -d -aes-256-cbc > file.out
+    >zcat <filename>.dmp.gz | openssl enc -d -aes-256-cbc > file.out
 
 
