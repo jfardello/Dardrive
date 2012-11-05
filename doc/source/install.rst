@@ -24,7 +24,7 @@ Download
 The code is hosted at `github <http://github.com/jfardello/Dardrive>`_ .
 
     
-   | ~/>wget \http://github.com/jfardello/Dardrive/dardrive-|release|.tar.bz2\ 
+   | ~/>wget \https://github.com/downloads/jfardello/Dardrive/dardrive-|release|.tar.gz\
 
    | ~/>tar xzf dardrive-|release|.tar.bz2 && cd dardrive-|release|
 
