@@ -16,7 +16,7 @@ from dar import Scheme, dar_par
 from db import Report, Importer, find_ext, Catalog, Lock
 from utils import userconfig, DARDRIVE_DEFAULTS, dar_status
 from utils import send_email, reindent, mk_dar_date
-from utils import mk_ssl_auth_file, which
+from utils import mk_ssl_auth_file
 from config import Config
 from cmdp import options, CmdApp, mkarg
 from excepts import *
