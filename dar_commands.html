@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dardrive Commands &mdash; dardrive 0.2.9b3 documentation</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700|Anonymous+Pro' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.9b3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bootstrap.js"></script>
+    <script type="text/javascript" src="_static/overrides.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="dardrive 0.2.9b3 documentation" href="index.html" />
+    <link rel="next" title="Basic concepts" href="concepts.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="container" id="toprow">
+            <div class="row">
+                <div class="span12">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html"><img
+                src="_static/img/hdd.png" alt="home">Dardrive</a>
+            <ul class="nav">
+      
+                <li class="dropdown">
+                    <a href="index.html" class="dropdown-toggle"
+                        data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu globaltoc" id="gtocmenu"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Dardrive Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Basic concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mysql.html">MySQL integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configopts.html">Jobs file options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_restore.html">Manual recovery</a></li>
+</ul>
+</ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Sections <b class="caret"></b></a>
+                    <ul class="dropdown-menu localtoc" id="ltocmenu"><ul>
+<li><a class="reference internal" href="#">Dardrive Commands</a></li>
+</ul>
+</ul>
+                </li>
+               <li> <a title="Usage" href="usage.html">Prev</a></li>
+               <li> <a title="Basic concepts" href="concepts.html">Next</a></li>
+            </ul>
+            <ul class="nav pull-right">
+                      <li class="divider-vertical"></li>
+                      <li>
+                         <form class="navbar-search pull-left"
+                             action="search.html" method="GET">
+                            <input type="text" name="q" class="search-query span2" placeholder="Search">
+                        </form>
+                      </li>
+                    </ul>
+        </div>
+    </div>
+</div>
+                    <div class="documentwrapper">
+                        <div class="body">
+                            
+  <div class="section" id="dardrive-commands">
+<h1>Dardrive Commands<a class="headerlink" href="#dardrive-commands" title="Permalink to this headline">¶</a></h1>
+<p><strong>addjob</strong></p>
+<p>Adds a job definition.</p>
+<div class="highlight-python"><pre>usage: addjob [-h] -R ROOT -A ARCHIVE_STORE [-C CATALOG_STORE] jobname
+
+positional arguments:
+  jobname               Job name
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -R ROOT, --root ROOT  Job root path
+  -A ARCHIVE_STORE, --archive-store ARCHIVE_STORE
+                        archive store
+  -C CATALOG_STORE, --catalog-store CATALOG_STORE
+                           catalog store</pre>
+</div>
+<p><strong>backup</strong></p>
+<p>Perform a backup task.</p>
+<div class="highlight-python"><pre>usage: backup [-h] -j JOB [-v] [-R ROOT] [-f]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -j JOB, --job JOB     Backup job
+  -v, --verbose         Verbose output
+  -R ROOT, --root ROOT  Override bkp root path.
+  -f, --full            Force a full backup</pre>
+</div>
+<p><strong>dbdump</strong></p>
+<p>Run an mysql backup job.</p>
+<div class="highlight-python"><pre>usage: dbdump [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Backup job</pre>
+</div>
+<p><strong>dbrecover</strong></p>
+<p>Load a db backups to file or stdout, decrypting and uncompressing as needed.</p>
+<div class="highlight-python"><pre>usage: dbrecover [-h] [-i ID] [-j JOB] filename
+
+positional arguments:
+  filename           output filename ("-" for stdout)
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -i ID, --id ID     Limit operation to specified backup id.
+  -j JOB, --job JOB  Limit operation to jobname</pre>
+</div>
+<p><strong>import</strong></p>
+<p>Import an untracked job to db.</p>
+<div class="highlight-python"><pre>usage: import [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Specifies the job</pre>
+</div>
+<p><strong>init</strong></p>
+<p>Inits the userconfig directory</p>
+<p><strong>modjob</strong></p>
+<p>Modifies any job section option.</p>
+<div class="highlight-python"><pre>Modifies any job section option.
+usage: modjob [-h] -j JOB -O OPTION
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -j JOB, --job JOB     Job being modified
+  -O OPTION, --option OPTION
+                        config string</pre>
+</div>
+<p><strong>parity</strong></p>
+<p>Generates &#8220;par2&#8221; error correction files.</p>
+<div class="highlight-python"><pre>usage: parity [-h] -i ID {create,test}
+
+positional arguments:
+  {create,test}
+
+optional arguments:
+  -h, --help      show this help message and exit
+  -i ID, --id ID  Specifies the jobid.</pre>
+</div>
+<p><strong>quit</strong></p>
+<p>Quits the dardrive interpreter if in interactive mode.</p>
+<p><strong>rebuild_dmd</strong></p>
+<p>Re-creates the dmd for a given job.</p>
+<div class="highlight-python"><pre>Re-creates the dmd for a given job.
+usage: rebuild_dmd [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Specifies the job name.</pre>
+</div>
+<p><strong>recover</strong></p>
+<p>Recover files through dar_manager.</p>
+<div class="highlight-python"><pre>usage: recover [-h] -f FILE -j JOB [-r RPATH] [-w WHEN]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  File to search for
+  -j JOB, --job JOB     Specifies the job
+  -r RPATH, --rpath RPATH
+                        Recover path
+  -w WHEN, --when WHEN  Before date (in dar_managet format)</pre>
+</div>
+<p><strong>show</strong></p>
+<p>Shows various listings.</p>
+<div class="highlight-python"><pre>usage: show [-h] [-l] [-j JOB] [-i ID] [-b] [-n NUM] [-t TYPE] {jobs,logs,archives,files}
+
+positional arguments:
+  {jobs,logs,archives,files}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l, --long            Show job details.
+  -j JOB, --job JOB     Filter by job
+  -i ID, --id ID        Filter by id
+  -b, --base            When showing files, show only dar archive base (excluding isolated catalogs)
+  -n NUM, --num NUM     Limit number of log|archives entries
+  -t TYPE, --type TYPE  filter by type</pre>
+</div>
+<p><strong>stats</strong></p>
+<p>Show job statistics.</p>
+<div class="highlight-python"><pre>usage: stats [-h] [-j JOB]
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Show stats for job</pre>
+</div>
+<p><strong>versions</strong></p>
+<p>Show available copies of a given file.</p>
+<div class="highlight-python"><pre>usage: versions [-h] -f FILE -j JOB
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  File to search for
+  -j JOB, --job JOB     Specifies the job</pre>
+</div>
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="push"><!--//--></div>
+    </div>
+    <div class="footer container">
+        <div class="span12">
+              &copy; Copyright 
+              <span id="contact">2012, José Manuel Fardello. </span>
+              
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
+    </div>
+    </body>
+</html>
