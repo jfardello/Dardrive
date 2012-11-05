@@ -41,6 +41,14 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
+gh-pages: clean html
+	cd  ../../pages/ && git rm -r . 
+	touch ../../pages/.nojekyll
+	cp -r $(BUILDDIR)/html/* ../../pages/ 
+	cd  ../../pages/ && git commit -a -m "Sphinx build."
+	cd ../../pages/ && git stage .
+	@echo 'Commit and push when ready or git reset --hard && git checkout master to revert'
+
 spell:
 	$(SPHINXBUILD) -b spelling  $(ALLSPHINXOPTS) $(BUILDDIR)/spelling
 	@echo
