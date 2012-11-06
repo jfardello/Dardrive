@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+import sphinxtrap as st
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -28,8 +29,7 @@ import sys, os
 extensions = ['sphinxcontrib.spelling']
 spelling_lang='en_US'
 
-sys.path.append(os.path.abspath('_themes'))
-html_theme_path = ['_themes']
+html_theme_path = [st.get_theme_dir()]
 html_theme = 'sphinxtrap'
 
 
@@ -101,7 +101,10 @@ pygments_style = 'sphinx'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    "analytics": "UA-36118346-1",
+    "blackbar":"false",
+    }
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -115,7 +118,7 @@ html_short_title = 'Dardrive'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = 'hdd.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

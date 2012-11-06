@@ -7,7 +7,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.2.9b3'
+version = '0.2.9b4'
 
 install_requires = [
     'sqlalchemy',
@@ -30,7 +30,9 @@ setup(name='dardrive',
       url='',
       license='GPLv3',
       packages=find_packages('src'),
-      package_dir={'': 'src'}, include_package_data=True,
+      package_dir={'': 'src'},
+      include_package_data=True,
+      package_data={'dardrive': ['tests/*.cfg']},
       zip_safe=False,
       install_requires=install_requires,
       entry_points={
