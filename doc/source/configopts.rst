@@ -115,6 +115,9 @@ root
     Points to the directory tree containing all the files that will be
     used in the filesystem backup operation as a source.
     
+save_xattr
+    Boolean which tells dar to save extended attributes.
+
 same_fs
     Boolean which tells dar to include only files in the same filesystem of
     ``root`` in the backups.

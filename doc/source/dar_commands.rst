@@ -132,10 +132,10 @@ Recover files through dar_manager. ::
 
 Shows various listings. ::
 
-    usage: show [-h] [-l] [-j JOB] [-i ID] [-b] [-n NUM] [-t TYPE] {jobs,logs,archives,files}
-    
+    usage: show [-h] [-l] [-j JOB] [-i ID] [-b] [-n NUM] [-t TYPE] {ver,jobs,logs,archives,files}
+
     positional arguments:
-      {jobs,logs,archives,files}
+      {ver,jobs,logs,archives,files}
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -145,7 +145,7 @@ Shows various listings. ::
       -b, --base            When showing files, show only dar archive base (excluding isolated catalogs)
       -n NUM, --num NUM     Limit number of log|archives entries
       -t TYPE, --type TYPE  filter by type
-    
+
 **stats**
 
 Show job statistics. ::
@@ -167,4 +167,16 @@ Show available copies of a given file. ::
       -h, --help            show this help message and exit
       -f FILE, --file FILE  File to search for
       -j JOB, --job JOB     Specifies the job
+    
+
+**dumpattr**
+
+Write extended attributes to every first slice in a job store. ::
+
+    usage: dumpattr [-h] -j JOB
+    
+    optional arguments:
+      -h, --help         show this help message and exit
+        -j JOB, --job JOB  Specifies the job
+    
     

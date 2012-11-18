@@ -61,3 +61,6 @@ class LockException(BackupException):
 
 class ParException(DardriveException):
     pass
+
+class XattrException(DardriveException):
+    pass

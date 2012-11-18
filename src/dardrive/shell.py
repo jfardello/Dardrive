@@ -16,7 +16,7 @@ from dar import Scheme, dar_par
 from db import Report, Importer, find_ext, Catalog, Lock
 from utils import userconfig, DARDRIVE_DEFAULTS, dar_status
 from utils import send_email, reindent, mk_dar_date
-from utils import mk_ssl_auth_file
+from utils import mk_ssl_auth_file, save_xattr 
 from config import Config
 from cmdp import options, CmdApp, mkarg
 from excepts import *
@@ -25,6 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from getpass import getpass
 from utils import Col, ALIGN, Table
+import pkg_resources
 
 
 setts_file = os.path.expanduser('~/.dardrive/setts.py')
@@ -143,7 +144,7 @@ class DardriveApp(CmdApp):
             self.stdout.write('Arguments needed  (use -h for help)\n')
 
     @options([
-        mkarg('action', choices=("jobs", "logs", "archives", "files"),
+        mkarg('action', choices=("ver", "jobs", "logs", "archives", "files"),
               default="archives"),
         mkarg('-l', '--long', action='store_true', help="Show job details."),
         mkarg('-j', '--job', help="Filter by job", default=None),
@@ -173,6 +174,10 @@ class DardriveApp(CmdApp):
                             eopt, getattr(each_sect, eopt)))
         elif opts.action == "jobs":
             self.stdout.write('\n'.join(self.cf.sections()) + "\n")
+
+        elif opts.action == "ver":
+            ver = pkg_resources.get_distribution("dardrive").version
+            self.stdout.write('\ndardrive %s\n\n'% ver)
 
         # show logs
         elif opts.action == "logs":
@@ -217,7 +222,6 @@ class DardriveApp(CmdApp):
                                           (sect.archive_store,
                                            each.job.name, each.id))
 
-        # Show archives
         elif opts.action == "archives":
             if opts.id:
                 r = Report(opts.job)
@@ -239,7 +243,14 @@ class DardriveApp(CmdApp):
                     names.append(cat.job.name)
                     types.append(cat.type.name)
                     dates.append(cat.date.strftime("%d/%m/%y %H:%M:%S"))
-                    statuses.append(str(cat.status))
+                    st = "%s" % cat.status
+                    if cat.status is None:
+                        locks = r.s.query(Lock).filter(Lock.cat_id == cat.id).all()
+                        for l in locks:
+                            if l.check_pid():
+                                st = "Running"
+                            break
+                    statuses.append(st)
 
                 self.stdout.write("%s\n" % Table(
                     Col("Archive Id", ids, "-"),
@@ -277,7 +288,7 @@ class DardriveApp(CmdApp):
                 i.hierarchy,
                 #when running ttookk will be none, we must figutre out
                 #how much has been taking.
-                timedelta(seconds=(dt.now() - i.date).total_seconds())
+                timedelta(seconds=i.ttook)
                 ], "-"))
 
     @options([
@@ -355,22 +366,40 @@ class DardriveApp(CmdApp):
             s.sess.delete(lock)
             s.sess.commit()
 
+
+
+    @options([mkarg('-j', '--job', required=True, help="Specifies the job")])
+    def do_dumpattr(self, arg, opts=None):
+        '''Write extended attributes to every first slice in a job store.'''
+        if opts.job not in self.cf.sections():
+            self.stdout.write("Unexistent job.\n")
+        else:
+            r = Report(opts.job)
+            ct = r.get_catalogs()
+            sect = getattr(self.cf, opts.job)
+            for each in ct:
+                self.logger.debug("Trying to xattr on %s" % each) 
+                save_xattr(each, sect)
+
+
+
     @options([
         mkarg('-j', '--job', required=True, help="Specifies the job name.")])
     def do_rebuild_dmd(self, arg, opts=None):
         '''Re-creates the dmd for a given job.'''
         cf = getattr(self.cf, opts.job)
-        s = Scheme(self.cf, opts.job)
-        lock = s.lock("rebuild_dmd")
+        sl = Scheme(self.cf, opts.job)
+        lock = sl.lock("rebuild_dmd")
         self.logger.debug("Removing dmd for %s" % opts.job)
         dmdfile = os.path.expanduser("~/.dardrive/dmd/%s.dmd" % opts.job)
         if os.path.exists(dmdfile):
             os.unlink(dmdfile)
         s = Scheme(self.cf, opts.job)
         r = Report(opts.job, session=s.sess)
-        for cat in r.get_catalogs(before=cf.catalog_begin, order="asc"):
+        for cat in r.get_catalogs(after=cf.catalog_begin, order="asc"):
             s.add_to_dmd(cat.id)
-        s.sess.delete(lock)
+        sl.sess.delete(lock)
+        sl.sess.commit()
         s.sess.commit()
 
     @options([

@@ -45,12 +45,20 @@ def check_file(file_name, exception=None):
         exception = ConfigFileException
     file_name = os.path.realpath(os.path.expanduser(file_name))
     if not os.path.exists(file_name):
-        raise exception('No such file: %s' % file_name)
+        raise exception('No such file: %s\n' % file_name)
     return file_name
 
 
 def validate_file(key, value, type, exception=None):
     return check_file(value, exception)
+
+def validate_dir(key, value, type, exception=None):
+    if exception is None:
+        exception = ConfigFileException
+    dir_ = check_file(value, exception)
+    if not os.path.isdir(dir_):
+        raise exception("%s must be a directory!!\n" % key) 
+    return dir_
 
 
 def validate_nostring(key, value, type, exception=None):
@@ -150,8 +158,8 @@ class Op(namedtuple('Op', ['value', 'type', 'validator'])):
         return super(Op, cls).__new__(cls, value, type, validator)
 
 DARDRIVE_DEFAULTS = {
-    'archive_store': Op('/mnt/bakcups/', str),
-    'catalog_store': Op('/mnt/bakcups/catalogs', str),
+    'archive_store': Op('/mnt/bakcups/', str, validate_dir),
+    'catalog_store': Op('/mnt/bakcups/catalogs', str, validate_dir),
     'catalog_begin': Op(str(datetime.date.today()), str, validate_date),
     'compr': Op('no', str, validate_nostring),
     'compr_exempt': Op(".*\.(gz|bz2|png|jpg|zip)", str),
@@ -179,6 +187,7 @@ DARDRIVE_DEFAULTS = {
     'redundancy': Op('2', int, validate_noint),
     'report_success': Op('no', bool),
     'root': Op('/home/' + __user_name, str),
+    'save_xattr': Op('yes', bool),
     'same_fs': Op('no', bool),
     'send_email': Op('no', bool),
     'slice': Op('2048M', str, validate_dar_slice),
@@ -392,32 +401,43 @@ def is_admin():
 def save_xattr(cat, cf):
     '''Save basic db data as extended attributes on the first slice of a
     backup file.'''
-    fl = os.path.join(cf.archive_store, cat.job.name, cat.id)
-    if cat.type.name == "MysqlDump":
-        fl += ".1.dmp"
-    elif cat.type.name == "gzMysqlDump":
-        fl += ".1.dmp.gz"
-    else:
-        fl += ".1.dar"
+    if not cf.save_xattr:
+        return
+    try:
+        fl = os.path.join(cf.archive_store, cat.job.name, cat.id)
+        if cat.type.name == "MysqlDump":
+            fl += ".1.dmp"
+        elif cat.type.name == "gzMysqlDump":
+            fl += ".1.dmp.gz"
+        else:
+            fl += ".1.dar"
 
-    x = xattr.xattr(fl)
-    x["user.dardrive.type"] = str(cat.type.name)
-    x["user.dardrive.job"] = str(cat.job.name)
-    if cat.comment:
-        x["user.dardrive.comment"] = str(cat.comment)
-    else:
-        x["user.dardrive.comment"] = ""
-    x["user.dardrive.date"] = str(cat.date)
-    if cat.parent:
-        x["user.dardrive.parent"] = str(cat.parent.id)
-    else:
-        x["user.dardrive.parent"] = ""
-    x["user.dardrive.enc"] = str(cat.enc)
-    x["user.dardrive.clean"] = str(cat.clean)
-    x["user.dardrive.hierarchy"] = str(cat.hierarchy)
-    x["user.dardrive.status"] = str(cat.status)
-    x["user.dardrive.ttook"] = str(cat.ttook)
-    x["user.dardrive.root"] = str(cf.root)
+        x = xattr.xattr(fl)
+        x["user.dardrive.type"] = str(cat.type.name)
+        x["user.dardrive.job"] = str(cat.job.name)
+        if cat.comment:
+            x["user.dardrive.comment"] = str(cat.comment)
+        else:
+            x["user.dardrive.comment"] = ""
+        x["user.dardrive.date"] = str(cat.date)
+        if cat.parent:
+            x["user.dardrive.parent"] = str(cat.parent.id)
+        else:
+            x["user.dardrive.parent"] = ""
+        x["user.dardrive.enc"] = str(cat.enc)
+        x["user.dardrive.clean"] = str(cat.clean)
+        x["user.dardrive.hierarchy"] = str(cat.hierarchy)
+        x["user.dardrive.status"] = str(cat.status)
+        x["user.dardrive.ttook"] = str(cat.ttook)
+        x["user.dardrive.root"] = str(cf.root)
+    except IOError, err:
+        if err.errno == errno.EOPNOTSUPP:
+            raise XattrException(
+                    'The jobstore\'s filesystem does not support user '
+                    'extended attributes, please disable the save_xattr '
+                    'option or change the archive_store location.\n')
+        else:
+            raise err
 
 
 #http://code.activestate.com/recipes/577202-render-tables-for-text-interface/

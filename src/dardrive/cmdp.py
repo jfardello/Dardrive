@@ -34,8 +34,8 @@ class options(object):
         #catch bad jobname definitions
         except (ConfigSectionException, BackupDBException, ParException), e:
             instance.stdout.write("%s\n" % e.message)
-        #catch locking stuff.
-        except LockException, e:
+        #catch locking and xattr exceptions.
+        except (LockException, XattrException), e:
             instance.report("%s" % e.message, opts.job, error=True)
 
     def __call__(self, wrapped):

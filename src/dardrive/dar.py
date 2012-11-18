@@ -415,7 +415,9 @@ class Scheme(object):
             os.unlink(auth_file)
             raise BackupDBException('Could not contact the mysql server, check'
                                     ' your configuration/connectivity.\n')
-
+        _dir_name = os.path.dirname(file_name)
+        if not os.path.exists(_dir_name):
+            os.makedirs(_dir_name, 0722)
         fd = os.open(file_name, os.O_WRONLY | os.O_CREAT, 0600)
         with os.fdopen(fd, 'w') as dmpfile:
             if self.cf.mysql_compr:
@@ -425,10 +427,6 @@ class Scheme(object):
                     cmdline += '| openssl aes-256-cbc -salt -pass file:%s' \
                         % pfile
                     cat.enc = True
-                self.logger.debug(cmdline)
-                p = subprocess.Popen(
-                    cmdline, stdin=None, stderr=subprocess.PIPE,
-                    stdout=dmpfile, shell=True)
             elif self.cf.encryption:
                 pfile = mk_ssl_auth_file(self.cf.encryption.split(":")[1])
                 cmdline = " ".join(args) + \
@@ -438,6 +436,7 @@ class Scheme(object):
                 cmdline = " ".join(args)
                 self.logger.debug(cmdline)
 
+            self.logger.debug(cmdline)
             p = subprocess.Popen(
                 cmdline, stdin=None, stderr=subprocess.PIPE,
                 stdout=dmpfile, shell=True)
@@ -503,6 +502,11 @@ class Scheme(object):
         '''Create a backup and an isolated catalog, commit the isolated
         catalog to the DMD database, and then point the dmd archive to the
         real backup archive.'''
+        if os.path.samefile(self.cf.archive_store, self.cf.catalog_store):
+            raise ConfigException("archive_store and catalog_store must be"
+                    " different directories.")
+        
+        self.logger.debug("About to create a catalog..")
         self.newcatalog = self.choose(force_full)
         lock = self.lock("fs_backup", cat=self.newcatalog)
         self.basename = self.newcatalog.id
@@ -555,6 +559,9 @@ class Scheme(object):
         except IOError:
             self.logger.debug("Extracting catalog %s from %s.." %
                               (catalog_path, archive_path))
+            _c_dir = os.path.dirname(catalog_path)
+            if not os.path.exists(_c_dir):
+                os.makedirs(_c_dir)
             ntpl = "%(dar)s -C %(catalog_path)s -A %(archive_path)s"
             args = {'dar': self.cf.dar_bin,
                     'catalog_path': catalog_path,
@@ -564,7 +571,7 @@ class Scheme(object):
                 self.add_to_dmd(catalog_id)
             else:
                 raise CatalogException(
-                    'Couldn\'t extract catalog from' % archive_path)
+                    'Couldn\'t extract catalog from %s.' % archive_path)
 
     def mk_bkp_args(self, basename):
         if self.newcatalog.type == self.Full:

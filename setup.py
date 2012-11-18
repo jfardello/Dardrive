@@ -1,13 +1,16 @@
 from setuptools import setup, find_packages
 import sys
 import os
+import imp
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.2.9b4'
+ver_file = os.path.join(os.path.dirname(__file__), "src/dardrive/__init__.py")
+ver = imp.load_source('ver', ver_file)
+version = ver.__release__
 
 install_requires = [
     'sqlalchemy',

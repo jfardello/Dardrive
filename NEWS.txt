@@ -1,9 +1,25 @@
 News
 ====
 
+*Release date: UNRELEASED*
+
+0.2.10
+
+* The "show archive" code now correctly displays the time.
+* archive_store and catalog_store are now validated, and report an error.
+* Catch and report errors when saving extended attributes.
+* Added an option which disables xattr writing.
+* Now dardrive detects and reports when archive_store and catalog_store
+  point to the same location.
+* Added a "show ver" subcommand that shows the dardrive version.
+* Show archives now reports running jobs.
+* Check for path existence where rebuilding the catalogs.
+* Fix dmd rebuilding locking bug
+
+
+
 0.2.9b2
 -----
 
-*Release date: UNRELEASED*
 
 * Initial GH import! (http://github.com/jfardello/dardrive)
