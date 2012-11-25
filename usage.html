@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usage &mdash; dardrive 0.2.10b2 documentation</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700|Anonymous+Pro' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.10b2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bootstrap.js"></script>
+    <script type="text/javascript" src="_static/overrides.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="dardrive 0.2.10b2 documentation" href="index.html" />
+    <link rel="next" title="Dardrive commands" href="dar_commands.html" />
+    <link rel="prev" title="Installing" href="install.html" /> 
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="container" id="toprow">
+            <div class="row">
+                <div class="span12">
+
+
+    
+ 
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html"><img
+                src="_static/hdd.png"
+            alt="home">dardrive</a>
+            <ul class="nav">
+      
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu globaltoc" id="gtocmenu"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_commands.html">Dardrive commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Basic concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mysql.html">MySQL integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configopts.html">Jobs file options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_restore.html">Manual recovery</a></li>
+</ul>
+</ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Sections <b class="caret"></b></a>
+                    <ul class="dropdown-menu localtoc" id="ltocmenu"><ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#creating-a-profile">Creating a profile</a></li>
+<li><a class="reference internal" href="#adding-jobs">Adding jobs</a></li>
+<li><a class="reference internal" href="#running-a-filesystem-backup">Running a filesystem backup</a></li>
+<li><a class="reference internal" href="#listing-archives-jobs-files-and-logs">Listing archives, jobs, files and logs</a></li>
+<li><a class="reference internal" href="#recovering-files">Recovering files</a></li>
+<li><a class="reference internal" href="#getting-statistics">Getting statistics</a></li>
+<li><a class="reference internal" href="#email-integration">Email Integration</a></li>
+<li><a class="reference internal" href="#encryption">Encryption</a></li>
+<li><a class="reference internal" href="#parity">Parity</a></li>
+<li><a class="reference internal" href="#importing-an-archive-store">Importing an archive store</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+                </li>
+               <li> <a title="Installing" href="install.html">Prev</a></li>
+               <li> <a title="Dardrive commands" href="dar_commands.html">Next</a></li>
+            </ul>
+            <ul class="nav pull-right">
+                      <li class="divider-vertical"></li>
+                      <li>
+                         <form class="navbar-search pull-left"
+                             action="search.html" method="GET">
+                            <input type="text" name="q" class="search-query span2" placeholder="Search">
+                        </form>
+                      </li>
+                    </ul>
+        </div>
+    </div>
+</div>
+                    <div class="documentwrapper">
+                        <div class="body">
+                            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-a-profile">
+<h2>Creating a profile<a class="headerlink" href="#creating-a-profile" title="Permalink to this headline">¶</a></h2>
+<p>In order to run, dardrive needs a directory in the user&#8217;s home that holds jobs
+configuration, dar_manager databases, and various settings.
+The user configuration directory is created by the init command.</p>
+<div class="highlight-python"><pre>~/&gt;dardrive init
+Config file written.
+Settings file written.</pre>
+</div>
+<p>This will place some files in the ~/.dardrive directory, now you can edit
+<tt class="docutils literal"><span class="pre">~/.dardrive/jobs.cfg</span></tt>, or alternatively modify it via the addjob and modjob
+commands.</p>
+<p>Config directory contents:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>setts.py</dt>
+<dd>Here you can specify database settings (see <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html">SQLAlchemy engines</a>).</dd>
+<dt>jobs.cfg</dt>
+<dd>The Jobs config file, it has an ini-file style, with mandatory [global]
+he Jobs config file, it has an ini-file style, with mandatory [global]
+section which holds all the defaults. Each extra section represents a
+backup job, which should have at least a root option defined. Lines
+beginning with a dash (&#8220;#&#8221;) or a semicolon (;) are considered comments.</dd>
+<dt>dardrive.db</dt>
+<dd>The default the SA backend.</dd>
+<dt>dmd/&lt;jobname&gt;.dmd</dt>
+<dd>Per job dar_manager database.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="adding-jobs">
+<h2>Adding jobs<a class="headerlink" href="#adding-jobs" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-sh"><div class="highlight"><pre>~/&gt;dardrive addjob projects -R /home/user/projects -A /mnt/bkp/arch <span class="se">\</span>
+    -C /mnt/bkp/cat
+Job added
+~/&gt;dardrive modjob -j projects -O <span class="s1">&#39;compr=yes&#39;</span> -O <span class="s1">&#39;par=yes&#39;</span>
+Job modified
+</pre></div>
+</div>
+<p>This will place a <tt class="docutils literal"><span class="pre">[projects]</span></tt> section in the ini style config file
+<tt class="docutils literal"><span class="pre">~/.dardrive/jobs.cfg</span></tt>, with <tt class="docutils literal"><span class="pre">compr</span></tt> and <tt class="docutils literal"><span class="pre">par</span></tt> options set to yes.</p>
+</div>
+<div class="section" id="running-a-filesystem-backup">
+<h2>Running a filesystem backup<a class="headerlink" href="#running-a-filesystem-backup" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-sh"><div class="highlight"><pre>~/&gt;dardrive backup -j projects
+job status:      successful
+<span class="nb">time </span>took:       00:01:12
+job id:          003r005938r2we010181173f5w23
+~/&gt;
+</pre></div>
+</div>
+<p>The backup command  produces a series of files in the catalog_store and the
+archive_store; archive files will be placed in &lt;&lt;archive_store&gt;&gt;/projects/ and
+catalogs inside  &lt;&lt;catalog_store&gt;&gt;/projects/.</p>
+<div class="alert alert-warning line-block">
+<div class="line"><strong>Warning</strong></div>
+<div class="line">Note that dardrive places a pid-lock that prevents running <strong>backup</strong>,
+<strong>dbdump</strong>, <strong>import</strong> and <strong>rebuild_dmd</strong> commands on the same job and
+host at the same time.</div>
+</div>
+</div>
+<div class="section" id="listing-archives-jobs-files-and-logs">
+<h2>Listing archives, jobs, files and logs<a class="headerlink" href="#listing-archives-jobs-files-and-logs" title="Permalink to this headline">¶</a></h2>
+<p>Listing operations are done by the show command, most of them can be filtered by the
+-j, -n, -i, and -t switches, which filter by job, entries, jobid (an specific backup task.)
+and backup type respectively. Optionally the &#8220;show files&#8221; commands can be modified by the -b, which
+will strip the &#8220;slice.extension&#8221; part of a backup, suitable for feeding dar commands.</p>
+<p>Examples:</p>
+<blockquote>
+<div><p>get last 3 bases of the projects job:</p>
+<div class="highlight-python"><pre>~/&gt; dardrive show archives -j projects -n 3</pre>
+</div>
+<p>show the log for the last run of myjob:</p>
+<div class="highlight-python"><pre>~/&gt; dardrive show log -j myjob -n 1</pre>
+</div>
+<p>show the log for the <tt class="docutils literal"><span class="pre">003r005938r2we010181173f5w23</span></tt> jobid:</p>
+<div class="highlight-python"><pre>~/&gt; dardrive show log -i 003r005938r2we010181173f5w23</pre>
+</div>
+<p>copy the files involved in the last full filesystem backup for the documents job:</p>
+<div class="highlight-python"><pre>~/&gt; for file in `dardrive show files -t Full -j documents -n 1`; do \
+        cp $file /mnt/usb ;done</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="recovering-files">
+<h2>Recovering files<a class="headerlink" href="#recovering-files" title="Permalink to this headline">¶</a></h2>
+<p>Recovery operations restores files to the recover_path location, in order to
+recover from the leatest archive:</p>
+<div class="highlight-python"><pre>dardrive recover -f myfile.png -j docs</pre>
+</div>
+<p>To recover specific versions a date string in dar&#8217;s format must be passed with
+the <tt class="docutils literal"><span class="pre">-w</span></tt> switch, dardrive creates those strings with the versions command:</p>
+<div class="highlight-python"><pre>dardrive versions -j docs -f myfile.rst
+2012/10/15-14:08:16
+2012/10/18-12:16:59
+dardrive recover -j docs -f myfile.rst -w "2012/10/18-12:16:59"</pre>
+</div>
+<dl class="docutils">
+<dt>Note that:</dt>
+<dd><ul class="first last simple">
+<li>dardrive will restore files or directory trees.</li>
+<li>dardrive will add a second to the date string because of the dar_manager
+logic which restores the latest file before this date.</li>
+<li>a changed inode (in the case of directories) does not explicitly means a
+change on its contents.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="getting-statistics">
+<h2>Getting statistics<a class="headerlink" href="#getting-statistics" title="Permalink to this headline">¶</a></h2>
+<p>Stats are saved for each successfull job, which means dar status 0 and 11, and
+they persist backup rotation.</p>
+<p>They can be globaly reseted whith the <cite>reset_stats</cite> command, and displayed by the <cite>show
+stats</cite> command, which may be filtered by job.</p>
+</div>
+<div class="section" id="email-integration">
+<h2>Email Integration<a class="headerlink" href="#email-integration" title="Permalink to this headline">¶</a></h2>
+<p>Email reporting is disabled by default, you can enable it by modifying the jobs&#8217;s
+<tt class="docutils literal"><span class="pre">send_email</span></tt> and <tt class="docutils literal"><span class="pre">report_success</span></tt> options</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "send_email=yes" -O "smtp_server=smtp.gmail.com:587"
+&gt;dardrive modjob -j docs -O "smtp_user=username@gmail.com" -O smtp_pass="secret"
+&gt;dardrive modjob -j docs -O "subject=Backup for Docs report"</pre>
+</div>
+<p>The smtp server is defined in the smtp_server option and it defaults to localhost.
+If the port is not specified (appending a semicolon and the port), port 25 is
+assumed, also if the port is set to 587, STARTTLS will be used with the
+<tt class="docutils literal"><span class="pre">smtp_user</span></tt> and <tt class="docutils literal"><span class="pre">smtp_pass</span></tt> options.</p>
+</div>
+<div class="section" id="encryption">
+<h2>Encryption<a class="headerlink" href="#encryption" title="Permalink to this headline">¶</a></h2>
+<p>Fs backup may be encrypted, there&#8217;s an option for passing encryption
+information to dar</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "encryption=aes:secret"</pre>
+</div>
+<p>Although that the previous example will make it, the prefferable way is to leave
+the password blank and provide one. This method will raise an error if dardrive is
+not running on a tty, ie inside a shell script.</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "encryption=aes:"
+  Please provide a password for the docs job:
+  Password: ***********</pre>
+</div>
+<p>This will create a temporary file on runtime that will be read by dar via the &#8220;&#8211;batch&#8221;
+switch.</p>
+<p>When running a database dump, just the &#8221;:password&#8221; part is relevant as dbdumps
+are always encrypted with OpenSSL&#8217;s aes-cbc 256 cipher.</p>
+</div>
+<div class="section" id="parity">
+<h2>Parity<a class="headerlink" href="#parity" title="Permalink to this headline">¶</a></h2>
+<p>Par2 error correction files are generated after each slice is created if the
+<tt class="docutils literal"><span class="pre">redundancy</span></tt> option is an integer between 1-100 which is the percent of
+redundancy saved. It can be disabled with the &#8220;0&#8221; value.</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "redundancy=0"</pre>
+</div>
+<p>Dardrive will generate parity files on the &#8220;local_store&#8221; by default, and move the
+file and the archives before creating a new slice. In order to generate the
+files on the final destination, i.e.: archive_store is a local filesystem or it
+is fast enough, you can disable the <tt class="docutils literal"><span class="pre">par_local</span></tt> boolean option.</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "par_local=no"</pre>
+</div>
+<p>Alternatively you can build parity files for individual and previously created files
+after enabling redundancy:</p>
+<div class="highlight-python"><pre>&gt;dardrive modjob -j docs -O "redundancy=5"
+&gt;dardrive parity create -i 0dc2597de4cf421fa038197242adb94d</pre>
+</div>
+</div>
+<div class="section" id="importing-an-archive-store">
+<h2>Importing an archive store<a class="headerlink" href="#importing-an-archive-store" title="Permalink to this headline">¶</a></h2>
+<p>Dardrive is server-less, even though the database can be centralized, there&#8217;s
+no need for that as dardrive saves all the data it needs as extended attributes
+on the first slice of an archive file. The only advantage on centralizing the
+database is to preserve logs. That being said, an archive_store can be imported
+into other machines just by defining a job pointing to it and being able to
+access that filesystem.</p>
+<div class="highlight-python"><pre>&gt;dardrive addjob srvstuff -R /srv/stuff -A /mnt/bkp/arch -C /var/cat
+&gt;dardrive modjob -j srvstuff -O "catalog_begin=2010-01-01"
+&gt;dardrive import -j srvstuff</pre>
+</div>
+<p class="alert alert-warning"><strong>Warning:</strong> If dardrive can&#8217;t access the corresponding catalogs from the
+catalog_store, it will isolate a new one, on slow &amp; &#8220;no-lseekable&#8221; media it
+this will be a long-lasting operation, and sometimes even expensive, in order
+to prevent that you should define the catalog_begin option for that job.</p>
+</div>
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="push"><!--//--></div>
+    </div>
+    <div class="footer container">
+        <div class="span12">
+              &copy; Copyright 
+              <span id="contact">2012, José Manuel Fardello. </span>
+              
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36118346-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+    </body>
+</html>

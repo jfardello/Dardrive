@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Manual recovery &mdash; dardrive 0.2.10b2 documentation</title>
+    
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700|Anonymous+Pro' rel='stylesheet' type='text/css'>    
+    <link rel="stylesheet" href="_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2.10b2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bootstrap.js"></script>
+    <script type="text/javascript" src="_static/overrides.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="dardrive 0.2.10b2 documentation" href="index.html" />
+    <link rel="prev" title="Jobs file options" href="configopts.html" /> 
+  </head>
+  <body>
+    <div class="wrapper">
+        <div class="container" id="toprow">
+            <div class="row">
+                <div class="span12">
+
+
+    
+ 
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="index.html"><img
+                src="_static/hdd.png"
+            alt="home">dardrive</a>
+            <ul class="nav">
+      
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Documentation <b class="caret"></b></a>
+                    <ul class="dropdown-menu globaltoc" id="gtocmenu"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dar_commands.html">Dardrive commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Basic concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mysql.html">MySQL integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configopts.html">Jobs file options</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Manual recovery</a></li>
+</ul>
+</ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Sections <b class="caret"></b></a>
+                    <ul class="dropdown-menu localtoc" id="ltocmenu"><ul>
+<li><a class="reference internal" href="#">Manual recovery</a><ul>
+<li><a class="reference internal" href="#listing-dar-archive-content">Listing dar archive content</a></li>
+<li><a class="reference internal" href="#restoring-files-with-dar">Restoring files with dar</a></li>
+<li><a class="reference internal" href="#mysql-restoring">Mysql restoring</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+                </li>
+               <li> <a title="Jobs file options" href="configopts.html">Prev</a></li>
+            </ul>
+            <ul class="nav pull-right">
+                      <li class="divider-vertical"></li>
+                      <li>
+                         <form class="navbar-search pull-left"
+                             action="search.html" method="GET">
+                            <input type="text" name="q" class="search-query span2" placeholder="Search">
+                        </form>
+                      </li>
+                    </ul>
+        </div>
+    </div>
+</div>
+                    <div class="documentwrapper">
+                        <div class="body">
+                            
+  <div class="section" id="manual-recovery">
+<h1>Manual recovery<a class="headerlink" href="#manual-recovery" title="Permalink to this headline">¶</a></h1>
+<p><strong>Just in the case that dardrive is not available</strong>, archives can be  manually
+restored as they are essentially dar or mysql_dump files. You&#8217;ll need the
+<tt class="docutils literal"><span class="pre">dar</span></tt>, <tt class="docutils literal"><span class="pre">gzip</span></tt>, <tt class="docutils literal"><span class="pre">par2</span></tt> and <tt class="docutils literal"><span class="pre">openssl</span></tt> commands.
+Please read dar&#8217;s docs <a class="reference external" href="http://dar.linux.free.fr/doc">here</a>, this page is just quick introduction to dar.</p>
+<div class="section" id="listing-dar-archive-content">
+<h2>Listing dar archive content<a class="headerlink" href="#listing-dar-archive-content" title="Permalink to this headline">¶</a></h2>
+<p>Theres no difference in listing file contents from archives or from isolated
+catalog files, assuming that /mnt/bkp/arch is dardrive&#8217;s archive_store and
+/mnt/bkp/cat the catalog_store:</p>
+<div class="highlight-python"><pre>&gt;dar -l /mnt/bkp/arch/home/8af5b24a77ff4b0ea5bd21fc62c02e4b
+&gt;dar -l /mnt/bkp/cat/home/8af5b24a77ff4b0ea5bd21fc62c02e4b</pre>
+</div>
+<p>Note that most dar commands will expect a &#8220;dar_base&#8221; as argument, which is the
+file name  without the trailing slice and extension.</p>
+</div>
+<div class="section" id="restoring-files-with-dar">
+<h2>Restoring files with dar<a class="headerlink" href="#restoring-files-with-dar" title="Permalink to this headline">¶</a></h2>
+<p>When restoring an archive dar will pull the content of all reference archives if
+it is restoring a differential backup, so in practice full and differential backups are
+restored the same way.</p>
+<p>In order to restore all files to the <tt class="docutils literal"><span class="pre">/output</span></tt> directory:</p>
+<div class="highlight-python"><pre>&gt;dar -x archive_base -R /output</pre>
+</div>
+<p>Restoring just some files:</p>
+<div class="highlight-python"><pre>&gt;dar -R /output -x archive_base -g files/to/recover</pre>
+</div>
+<p>Please take a look at the dar_manager man page, if you have access to the
+&#8221;.dardrive&#8221; directory of the user that runs the backups, you may take advantage of the
+per job dar_manager database that dardrive mantains there.
+(<tt class="docutils literal"><span class="pre">~user/.dardrive/dmds/jobname.dmd</span></tt>)</p>
+</div>
+<div class="section" id="mysql-restoring">
+<h2>Mysql restoring<a class="headerlink" href="#mysql-restoring" title="Permalink to this headline">¶</a></h2>
+<p>Mysql backups are plain sql files that can be optionally encrypted, and compressed,
+you can guess that information from the job.cfg file, but an old backup could
+be produced with a different version of that cfg file.
+You can get information on how a backup was produced by examining the first
+slice&#8217;s extended attributes:</p>
+<div class="highlight-python"><pre>&gt;getfattr &lt;filename&gt;.dmp.gz | grep enc
+getfattr: Removing leading '/' from absolute path names
+user.dardrive.enc="True"</pre>
+</div>
+<p>The encryption for bd dumps is openssl&#8217;s aes cbc 256, and the  commpression can be
+deduced by the file extension, in this case:</p>
+<div class="highlight-python"><pre>&gt;zcat &lt;filename&gt;.dmp.gz | openssl enc -d -aes-256-cbc &gt; file.out</pre>
+</div>
+</div>
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="push"><!--//--></div>
+    </div>
+    <div class="footer container">
+        <div class="span12">
+              &copy; Copyright 
+              <span id="contact">2012, José Manuel Fardello. </span>
+              
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36118346-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+    </body>
+</html>
