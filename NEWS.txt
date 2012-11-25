@@ -3,7 +3,14 @@ News
 
 *Release date: UNRELEASED*
 
-0.2.10
+0.2.10b2
+
+* Stats are preserved from rotation
+* There's a command to reset stats
+* "stats" command was moved to "show stats"   
+* Fix: It is now possible to show stats while a backup is running. 
+
+0.2.10b1
 
 * The "show archive" code now correctly displays the time.
 * archive_store and catalog_store are now validated, and report an error.

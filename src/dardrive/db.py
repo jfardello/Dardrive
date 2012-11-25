@@ -4,11 +4,12 @@ import sys
 import uuid
 import logging
 import glob
-import xattr
+import copy
 from socket import gethostname
 from datetime import datetime
 from datetime import timedelta
 
+import xattr
 from sqlalchemy import func, or_, create_engine, ForeignKey, Column
 from sqlalchemy import DateTime, Integer, SmallInteger, String, Boolean
 from sqlalchemy.sql import ClauseElement
@@ -16,8 +17,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import UniqueConstraint
-
-
 from config import Config
 from utils import mkdir, DARDRIVE_DEFAULTS
 from excepts import *
@@ -50,6 +49,17 @@ def find_ext(btype):
         if btype == name:
             return ext
     raise Exception("Extension not found.")
+
+class Stat(Base):
+    __tablename__ = "stats"
+    id = Column(String, primary_key=True, default=mkid)
+    job_id = Column(String, ForeignKey('jobs.id'))
+    job = relationship("Job")
+    type_id = Column(String, ForeignKey('types.id'))
+    type = relationship("BackupType")
+    date = Column(DateTime, default=datetime.now)
+    ttook = Column(Integer, nullable=True)
+
 
 
 class Catalog(Base):
@@ -85,7 +95,6 @@ class Catalog(Base):
 
     def __repr__(self):
         return "<%s:%s>" % (self.__class__.__name__, self.id)
-
 
 class BackupType(Base):
     __tablename__ = "types"
@@ -168,6 +177,19 @@ def get_or_create(model, sess, **kwargs):
         sess.commit()
         logger.debug("created: %s" % instance)
     return instance
+
+def save_stats(ins, s):
+    '''Saves time statistics.'''
+    logger = logging.getLogger("db.save_stats")
+    #dar successfull codes, see dar(1)
+    if ins.status in [0, 11]:
+        with s.begin(subtransactions=True):
+            c = s.query(Stat).filter_by(id=ins.id).first()
+            if not c:
+                c = Stat(id=ins.id, job=ins.job, type=ins.type,
+                    date=ins.date, ttook=ins.ttook)
+                s.add(c)
+                logger.debug("Stats saved for %s" % c.id)
 
 
 class Importer(object):
@@ -294,33 +316,33 @@ class Report(object):
     def avg(self, backup_type=None):
         '''Returns the average time in seconds for a given job and job type
         (if any)'''
-        avg = self.s.query(func.avg(Catalog.ttook))
+        avg = self.s.query(func.avg(Stat.ttook))
         if self.job:
-            avg = avg.filter(Catalog.job == self.job)
+            avg = avg.filter(Stat.job == self.job)
         if backup_type:
-            avg = avg.filter(Catalog.type == self.type(backup_type))
+            avg = avg.filter(Stat.type == self.type(backup_type))
 
         avg = avg.one()
         if avg[0]:
             return timedelta(seconds=int(avg[0]))
         else:
-            return "00:00:00"
+            return "No data."
 
     def last_run(self, backup_type=None):
         '''Returns the time in seconds for the last run of a given job and job
         type(if any)'''
 
-        l = self.s.query(Catalog.ttook)
+        l = self.s.query(Stat.ttook)
         if self.job:
-            l = l.filter(Catalog.job == self.job)
+            l = l.filter(Stat.job == self.job)
         if backup_type:
-            l = l.filter(Catalog.type == self.type(backup_type))
+            l = l.filter(Stat.type == self.type(backup_type))
 
-        l = l.order_by(Catalog.date.desc()).first()
+        l = l.order_by(Stat.date.desc()).first()
         if l:
             return timedelta(seconds=l[0])
         else:
-            return "00:00:00"
+            return "No data"
 
     def get_catalogs(self, catalog=None, order="desc", types=None, after=None,
                      entries=0):

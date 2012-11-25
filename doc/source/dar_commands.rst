@@ -1,182 +1,214 @@
-Dardrive Commands
+Dardrive commands
 =================
 
 
-**addjob** 
-
-Adds a job definition. ::
-
-    usage: addjob [-h] -R ROOT -A ARCHIVE_STORE [-C CATALOG_STORE] jobname
-    
-    positional arguments:
-      jobname               Job name
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -R ROOT, --root ROOT  Job root path
-      -A ARCHIVE_STORE, --archive-store ARCHIVE_STORE
-                            archive store
-      -C CATALOG_STORE, --catalog-store CATALOG_STORE
-                               catalog store
 
 
-**backup**
 
-Perform a backup task. ::
+addjob:
+_______
 
-    usage: backup [-h] -j JOB [-v] [-R ROOT] [-f]
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -j JOB, --job JOB     Backup job
-      -v, --verbose         Verbose output
-      -R ROOT, --root ROOT  Override bkp root path.
-      -f, --full            Force a full backup
-    
-**dbdump**
 
-Run an mysql backup job. ::
+Adds a job definition.
+usage: addjob [-h] -R ROOT -A ARCHIVE_STORE [-C CATALOG_STORE] jobname
 
-    usage: dbdump [-h] -j JOB
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-      -j JOB, --job JOB  Backup job
-    
-**dbrecover**
+positional arguments:
+  jobname               Job name
 
-Load a db backups to file or stdout, decrypting and uncompressing as needed. ::
+optional arguments:
+  -h, --help            show this help message and exit
+  -R ROOT, --root ROOT  Job root path
+  -A ARCHIVE_STORE, --archive-store ARCHIVE_STORE
+                        archive store
+  -C CATALOG_STORE, --catalog-store CATALOG_STORE
+                        catalog store
 
-    usage: dbrecover [-h] [-i ID] [-j JOB] filename
-    
-    positional arguments:
-      filename           output filename ("-" for stdout)
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-      -i ID, --id ID     Limit operation to specified backup id.
-      -j JOB, --job JOB  Limit operation to jobname
-    
-**import**
 
-Import an untracked job to db. ::
 
-    usage: import [-h] -j JOB
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-      -j JOB, --job JOB  Specifies the job
+backup:
+_______
 
-    
-**init**
 
-Inits the userconfig directory
+Perform a backup task
+usage: backup [-h] -j JOB [-v] [-R ROOT] [-f]
 
-    
-**modjob**
+optional arguments:
+  -h, --help            show this help message and exit
+  -j JOB, --job JOB     Backup job
+  -v, --verbose         Verbose output
+  -R ROOT, --root ROOT  Override bkp root path.
+  -f, --full            Force a full backup
 
-Modifies any job section option. ::
 
-    Modifies any job section option.
-    usage: modjob [-h] -j JOB -O OPTION
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -j JOB, --job JOB     Job being modified
-      -O OPTION, --option OPTION
-                            config string
-    
-**parity**
 
-Generates "par2" error correction files. ::
+dbdump:
+_______
 
-    usage: parity [-h] -i ID {create,test}
-    
-    positional arguments:
-      {create,test}
-    
-    optional arguments:
-      -h, --help      show this help message and exit
-      -i ID, --id ID  Specifies the jobid.
-    
-**quit**
+
+Run an mysql backup job
+usage: dbdump [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Backup job
+
+
+
+dbrecover:
+__________
+
+
+Load a db backup to file or stdout.
+usage: dbrecover [-h] [-i ID] [-j JOB] filename
+
+positional arguments:
+  filename           output filename ("-" for stdout)
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -i ID, --id ID     Limit operation to specified backup id.
+  -j JOB, --job JOB  Limit operation to jobname
+
+
+
+dumpattr:
+_________
+
+
+Write extended attributes to every first slice in a job store.
+usage: dumpattr [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Specifies the job
+
+
+
+import:
+_______
+
+
+Import an untracked job store to db.
+usage: import [-h] -j JOB
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Specifies the job
+
+
+
+init:
+_____
+
+
+Creates the user config directory
+
+
+modjob:
+_______
+
+
+Modifies any job section option.
+usage: modjob [-h] -j JOB -O OPTION
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -j JOB, --job JOB     Job being modified
+  -O OPTION, --option OPTION
+                        config string
+
+
+
+parity:
+_______
+
+
+Generate "par2" error correction files.
+usage: parity [-h] -i ID {create,test}
+
+positional arguments:
+  {create,test}
+
+optional arguments:
+  -h, --help      show this help message and exit
+  -i ID, --id ID  Specifies the jobid.
+
+
+
+quit:
+_____
+
 
 Quits the dardrive interpreter if in interactive mode.
 
-**rebuild_dmd**
 
-Re-creates the dmd for a given job. ::
-
-    Re-creates the dmd for a given job.
-    usage: rebuild_dmd [-h] -j JOB
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-      -j JOB, --job JOB  Specifies the job name.
-    
-**recover**
-
-Recover files through dar_manager. ::
-
-    usage: recover [-h] -f FILE -j JOB [-r RPATH] [-w WHEN]
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -f FILE, --file FILE  File to search for
-      -j JOB, --job JOB     Specifies the job
-      -r RPATH, --rpath RPATH
-                            Recover path
-      -w WHEN, --when WHEN  Before date (in dar_managet format)
-    
-**show**
-
-Shows various listings. ::
-
-    usage: show [-h] [-l] [-j JOB] [-i ID] [-b] [-n NUM] [-t TYPE] {ver,jobs,logs,archives,files}
-
-    positional arguments:
-      {ver,jobs,logs,archives,files}
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -l, --long            Show job details.
-      -j JOB, --job JOB     Filter by job
-      -i ID, --id ID        Filter by id
-      -b, --base            When showing files, show only dar archive base (excluding isolated catalogs)
-      -n NUM, --num NUM     Limit number of log|archives entries
-      -t TYPE, --type TYPE  filter by type
-
-**stats**
-
-Show job statistics. ::
-
-    usage: stats [-h] [-j JOB]
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-      -j JOB, --job JOB  Show stats for job
+rebuild_dmd:
+____________
 
 
-**versions** 
+Re-creates the dmd for a given job.
+usage: rebuild_dmd [-h] -j JOB
 
-Show available copies of a given file. ::
+optional arguments:
+  -h, --help         show this help message and exit
+  -j JOB, --job JOB  Specifies the job name.
 
-    usage: versions [-h] -f FILE -j JOB
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -f FILE, --file FILE  File to search for
-      -j JOB, --job JOB     Specifies the job
-    
 
-**dumpattr**
 
-Write extended attributes to every first slice in a job store. ::
+recover:
+________
 
-    usage: dumpattr [-h] -j JOB
-    
-    optional arguments:
-      -h, --help         show this help message and exit
-        -j JOB, --job JOB  Specifies the job
-    
-    
+
+Recover files through dar_manager
+usage: recover [-h] -f FILE -j JOB [-r RPATH] [-w WHEN]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  File to search for
+  -j JOB, --job JOB     Specifies the job
+  -r RPATH, --rpath RPATH
+                        Recover path
+  -w WHEN, --when WHEN  Before date (in dar_managet format)
+
+
+
+reset_stats:
+____________
+
+
+Reset statistics
+
+
+show:
+_____
+
+
+Shows various listings
+usage: show [-h] [-l] [-j JOB] [-i ID] [-b] [-n NUM] [-t TYPE] {ver,jobs,logs,archives,files,stats}
+
+positional arguments:
+  {ver,jobs,logs,archives,files,stats}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l, --long            Show job details.
+  -j JOB, --job JOB     Filter by job
+  -i ID, --id ID        Filter by id
+  -b, --base            When showing files, show only dar archive base (excluding isolated catalogs)
+  -n NUM, --num NUM     Limit number of log|archives entries
+  -t TYPE, --type TYPE  filter by type
+
+
+
+versions:
+_________
+
+
+Show available copies of a given file
+usage: versions [-h] -f FILE -j JOB
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE, --file FILE  File to search for
+  -j JOB, --job JOB     Specifies the job
+

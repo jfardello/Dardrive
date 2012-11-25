@@ -1,7 +1,3 @@
-# Makefile for Sphinx documentation
-#
-
-# You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
@@ -41,6 +37,10 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
+comm-doc:
+	echo -e "Dardrive commands\n=================\n\n\n" > source/dar_commands.rst
+	./commands.sh
+
 gh-pages: clean html
 	cd  ../../pages/ && git rm -r . 
 	touch ../../pages/.nojekyll
@@ -52,7 +52,8 @@ gh-pages: clean html
 spell:
 	$(SPHINXBUILD) -b spelling  $(ALLSPHINXOPTS) $(BUILDDIR)/spelling
 	@echo
-html:
+
+html: comm-doc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

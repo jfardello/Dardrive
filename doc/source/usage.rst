@@ -130,12 +130,11 @@ Note that:
 Getting statistics
 ------------------
 
-Stats are calculated for each backup type, and jobid, archives that have been
-deleted from the database are no longer tracked, e.g., after a full backup
-incrementals are deleted and the incremental statistic for that job are lost. 
+Stats are saved for each successfull job, which means dar status 0 and 11, and
+they persist backup rotation.
 
-Stats are reported by the stats command, 00:00:00 values means that dardrive
-has no information to calculate time averages yet.
+They can be globaly reseted whith the `reset_stats` command, and displayed by the `show
+stats` command, which may be filtered by job.
 
 
 Email Integration

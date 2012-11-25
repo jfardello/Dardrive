@@ -24,10 +24,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
 
-
 from config import Config
-from db import Catalog, BackupType, Job, engine, create_all, Lock
-from db import get_or_create, dardrive_types, find_ext, Report
+from db import Catalog, Stat, BackupType, Job, engine, create_all, Lock
+from db import get_or_create, dardrive_types, find_ext, Report, save_stats
 from excepts import *
 from utils import mkdir, userconfig, DARDRIVE_DEFAULTS, check_file
 from utils import mk_mysql_auth_file, ordinal, parsedar_dates
@@ -115,6 +114,8 @@ class Scheme(object):
         Sess = sessionmaker(bind=engine)
         self.sess = Sess(bind=engine)
 
+
+
         #init dardrive backup types
         for btype, ext in dardrive_types:
             setattr(self, btype, self.get_or_create(BackupType, name=btype))
@@ -133,6 +134,9 @@ class Scheme(object):
             run = self.run_command('%(dar_manager)s -C %(dmd_file)s', args)
             if run[0].returncode > 0:
                 raise BackupException
+
+    def save_stats(self, ins):
+        save_stats(ins, self.sess)
 
     def get_or_create(self, model, **kwargs):
         return get_or_create(model, self.sess, **kwargs)
@@ -447,6 +451,7 @@ class Scheme(object):
 
             cat.ttook = int(end_time - start_time)
             cat.log = "stdout:\n%s\nstderr:\n%s\n" % comm
+            self.sess.commit()
 
             if p.returncode == 0:
                 if self.cf.redundancy:
@@ -464,12 +469,14 @@ class Scheme(object):
                             cmd=["-j", self.section, "-i", cat.id.encode(),
                                  "-s", "1"], sect=self.cf)
 
+                self.save_stats(cat)
                 cat.clean = True
 
             cat.status = p.returncode
             dmpfile.flush()
             save_xattr(cat, self.cf)
             self.sess.commit()
+
         self.logger.debug("Deleting authfile %s.." % auth_file)
         os.unlink(auth_file)
         if self.cf.encryption:
@@ -523,6 +530,7 @@ class Scheme(object):
         if run[0].returncode in [0, 5, 11]:
             self.newcatalog.clean = True
             self.sess.commit()
+            self.save_stats(self.newcatalog)
             #the xattributes hold data needed when importing an archive store
             #into db.
             save_xattr(self.newcatalog, self.cf)

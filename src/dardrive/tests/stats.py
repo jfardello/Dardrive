@@ -15,6 +15,7 @@ class Stat(object):
     >>> from sqlalchemy import func
     >>> from sqlalchemy import create_engine
     >>> from dardrive.db import *
+    >>> from dardrive.db import save_stats
     >>> from sqlalchemy.orm import relationship, sessionmaker
     >>> create_all(darsetts.engine)
     >>> Sess = sessionmaker(bind=darsetts.engine)
@@ -29,8 +30,14 @@ class Stat(object):
     >>> cat1.ttook = 100
     >>> cat2.ttook = 50
     >>> cat3.ttook = 60
+    >>> cat1.status = 0
+    >>> cat2.status = 0
+    >>> cat3.status = 0
     >>> s.add_all([cat1, cat2, cat3])
     >>> s.commit()
+    >>> save_stats(cat1, s)
+    >>> save_stats(cat2, s)
+    >>> save_stats(cat3, s)
     >>> r.avg()
     datetime.timedelta(0, 70)
     >>> r.avg(backup_type=inc)

@@ -13,7 +13,7 @@ import subprocess
 from collections import namedtuple
 
 from dar import Scheme, dar_par
-from db import Report, Importer, find_ext, Catalog, Lock
+from db import Report, Importer, find_ext, Catalog, Lock, Stat, engine
 from utils import userconfig, DARDRIVE_DEFAULTS, dar_status
 from utils import send_email, reindent, mk_dar_date
 from utils import mk_ssl_auth_file, save_xattr 
@@ -144,7 +144,8 @@ class DardriveApp(CmdApp):
             self.stdout.write('Arguments needed  (use -h for help)\n')
 
     @options([
-        mkarg('action', choices=("ver", "jobs", "logs", "archives", "files"),
+        mkarg('action', 
+            choices=("ver", "jobs", "logs", "archives", "files", "stats"),
               default="archives"),
         mkarg('-l', '--long', action='store_true', help="Show job details."),
         mkarg('-j', '--job', help="Filter by job", default=None),
@@ -178,6 +179,31 @@ class DardriveApp(CmdApp):
         elif opts.action == "ver":
             ver = pkg_resources.get_distribution("dardrive").version
             self.stdout.write('\ndardrive %s\n\n'% ver)
+
+        #show stats
+        elif opts.action == "stats":
+            def stats(sect):
+                if sect in self.cf.sections():
+                    r = Report(sect)
+                    self.stdout.write('%s: \n' % sect)
+                    for each in r.types():
+                        last = r.last_run(backup_type=each)
+                        avg = r.avg(backup_type=each)
+                        self.stdout.write('\t %s backup: \n' % each)
+                        self.stdout.write('\t\t last run time:\t%s\n' % last)
+                        self.stdout.write('\t\t average time:\t%s\n' % avg)
+
+                else:
+                    self.stdout.write("Can't find section %s!\n" % sect)
+            if opts.job:
+                stats(opts.job)
+            else:
+                for sect in self.cf.sections():
+                    try:
+                        stats(sect)
+                    except NoResultFound:
+                        self.stdout.write('There\'s no info on %s in the '
+                                      'database.\n' % sect)
 
         # show logs
         elif opts.action == "logs":
@@ -366,6 +392,10 @@ class DardriveApp(CmdApp):
             s.sess.delete(lock)
             s.sess.commit()
 
+    def do_reset_stats(self, arg):
+        '''Reset statistics'''
+        Stat.__table__.drop(engine, checkfirst=True)
+        self.stdout.write("Statistics reset.\n")
 
 
     @options([mkarg('-j', '--job', required=True, help="Specifies the job")])
@@ -438,8 +468,7 @@ class DardriveApp(CmdApp):
         mkarg('-j', '--job', default=None, help='Limit operation to jobname'),
         mkarg('filename', help="output filename (\"-\" for stdout)")])
     def do_dbrecover(self, arg, opts=None):
-        '''Load a db backups to file or stdout, decrypting and uncompressing
-        as needed.'''
+        '''Load a db backup to file or stdout.'''
         if not opts.id and not opts.job:
             sys.stderr.write("Please specify either -j or -i options.\n")
         else:
@@ -498,31 +527,6 @@ class DardriveApp(CmdApp):
             if retcode != 0:
                 sys.stderr.write("Recovery failed with status %s.\n" % retcode)
 
-    @options([mkarg('-j', '--job', help="Show stats for job", default=False)])
-    def do_stats(self, arg, opts=None):
-        '''Show job statistics'''
-        def stats(sect):
-            if sect in self.cf.sections():
-                r = Report(sect)
-                self.stdout.write('%s: \n' % sect)
-                for each in r.types():
-                    last = r.last_run(backup_type=each)
-                    avg = r.avg(backup_type=each)
-                    self.stdout.write('\t %s backup: \n' % each)
-                    self.stdout.write('\t\t last run time:\t%s\n' % last)
-                    self.stdout.write('\t\t average time:\t%s\n' % avg)
-
-            else:
-                self.stdout.write("Can't find section %s!\n" % sect)
-        if opts.job:
-            stats(opts.job)
-        else:
-            for sect in self.cf.sections():
-                try:
-                    stats(sect)
-                except NoResultFound:
-                    self.stdout.write('There\'s no info on %s in the '
-                                      'database.\n' % sect)
 
     def do_init(self, arg, opts=None):
         '''Creates the user config directory'''
