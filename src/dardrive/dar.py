@@ -263,7 +263,11 @@ class Scheme(object):
 
         #The period will vary depending on the generation.
         if hierarchy == 1:
-            period = datetime.date(cat.date.year, cat.date.month + 1, 1)
+            #month overload
+            if cat.date.month == 12:
+                period = datetime.date(cat.date.year + 1 ,  1, 1)
+            else:
+                period = datetime.date(cat.date.year, cat.date.month + 1, 1)
             del_cond = self.dt.today() - datetime.timedelta(days=30)
         elif hierarchy == 2:
             period = datetime.date(cat.date.year + 1, 1, 1)

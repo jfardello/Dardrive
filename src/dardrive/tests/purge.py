@@ -23,6 +23,10 @@ class TestPurge(object):
     >>> tday = date.today().day
     >>> Inc = s.Incremental
     >>> Full = s.Full
+    >>> last_year = datetime.today().year - 1
+    >>> s.sess.add(db.Catalog(job=s.Job, date=datetime(last_year -1, 11, 27), type=Full))
+    >>> s.sess.add(db.Catalog(job=s.Job, date=datetime(last_year -1, 12, 27), type=Full))
+    >>> s.sess.add(db.Catalog(job=s.Job, date=datetime(last_year, 12, 31), type=Full))
     >>> s.sess.add(db.Catalog(job=s.Job, date=days_back(100 + tday), type=Full))
     >>> s.sess.add(db.Catalog(job=s.Job, date=days_back(80 + tday), type=Full))
     >>> s.sess.add(db.Catalog(job=s.Job, date=days_back(4), type=s.Full))
@@ -36,13 +40,13 @@ class TestPurge(object):
     >>> s.sess.add(db.Catalog(job=s.Job, date=days_back(1), type=Inc, parent=last))
     >>> s.sess.commit()
     >>> s.sess.query(db.Catalog).update({db.Catalog.clean:1})
-    8
+    11
     >>> s.sess.commit()
     >>> s.promote(s.Full)
     >>> s.sess.query(db.Catalog).filter(db.Catalog.hierarchy == 1).count()
     4
     >>> s.sess.query(db.Catalog).filter(db.Catalog.hierarchy == 2).count()
-    2
+    3
     >>>
     '''
     pass
