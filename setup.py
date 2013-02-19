@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from setuptools import setup, find_packages
 import sys
 import os
@@ -23,14 +26,20 @@ setup(name='dardrive',
       version=version,
       description="A dar based backup tool",
       long_description=README + '\n\n' + NEWS,
-      classifiers=[
-        'System :: Archiving :: Backup',
-      ],
-      keywords='backup dar cli',
-      author='Jos\xc3\xa9 Manuel Fardello',
+      author='José Manuel Fardello',
       author_email='jmfardello@gmail.com',
       test_suite="dardrive.tests.suite",
-      url='',
+      keywords="dar cli backup python cloud",
+      url="http://jfardello.github.com/Dardrive/",
+      download_url = "http://pypi.python.org/pypi/dardrive",
+      classifiers=[
+          'Development Status :: 4 - Beta',
+          'Intended Audience :: System Administrators',
+          'License :: OSI Approved :: MIT License',
+          'Operating System :: POSIX :: Linux',
+          'Programming Language :: Python :: 2.7',
+          'Topic :: System :: Archiving :: Backup',
+      ],
       license='GPLv3',
       packages=find_packages('src'),
       package_dir={'': 'src'},

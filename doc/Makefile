@@ -42,9 +42,10 @@ comm-doc:
 	./commands.sh
 
 gh-pages: clean html
-	cd  ../../pages/ && git rm -r . 
+	cd  ../../pages/ && git rm --ignore-unmatch -r . 
 	touch ../../pages/.nojekyll
 	cp -r $(BUILDDIR)/html/* ../../pages/ 
+	cd  ../../pages/ && git add . 
 	cd  ../../pages/ && git commit -a -m "Sphinx build."
 	cd ../../pages/ && git stage .
 	@echo 'Commit and push when ready or git reset --hard && git checkout master to revert'

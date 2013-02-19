@@ -3,6 +3,10 @@ News
 
 *Release date: UNRELEASED*
 
+0.2.10b3
+
+* Bugfix to the purge routine.
+
 0.2.10b2
 
 * Stats are preserved from rotation

@@ -18,16 +18,11 @@ Prerequisites
     version.
 
 
-Download
---------
+Installing
+----------
 
-The code is hosted at `github <http://github.com/jfardello/Dardrive>`_ .
+The full code is hosted at `github <http://github.com/jfardello/Dardrive>`_ and
+packages are available at `pypi <https://pypi.python.org/pypi/dardrive/>`_.
 
-    
-   | ~/>wget \https://github.com/downloads/jfardello/Dardrive/dardrive-|release|.tar.gz\
-
-   | ~/>tar xzf dardrive-|release|.tar.gz && cd dardrive-|release|
-
-   | ~/>sudo python setup.py install
-
+   | ~/>sudo pip install dardrive 
 
