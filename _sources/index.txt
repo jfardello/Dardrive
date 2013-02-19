@@ -51,8 +51,7 @@ For the impatient
 
 .. code-block:: console
 
-    user@box:~/> sudo pip install \
-     https://github.com/downloads/jfardello/Dardrive/dardrive-0.2.10b2.tar.gz
+    user@box:~/> sudo pip install dardrive
     [..]
     user@box:~/> dardrive init
     Config file written.
