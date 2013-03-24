@@ -384,12 +384,14 @@ class DardriveApp(CmdApp):
             dmdfile = os.path.expanduser("~/.dardrive/dmd/%s.dmd" % opts.job)
             if os.path.exists(dmdfile):
                 os.unlink(dmdfile)
-            s = Scheme(self.cf, opts.job)  # re-creates de dmd
+            s.sess.delete(lock)
+            s = Scheme(self.cf, opts.job)
+            lock2 = s.lock('rebuild')
             r = Report(opts.job, session=s.sess)
             for cat in r.get_catalogs(order="asc"):
                 if cat.date >= dt.strptime(cs.catalog_begin, "%Y-%m-%d"):
                     s.add_to_dmd(cat.id)
-            s.sess.delete(lock)
+            s.sess.delete(lock2)
             s.sess.commit()
 
     def do_reset_stats(self, arg):
@@ -433,11 +435,16 @@ class DardriveApp(CmdApp):
         s.sess.commit()
 
     @options([
-        mkarg('-f', '--file', required=True, help="File to search for"),
+        mkarg('-f', '--file', help="Files to recover", group="recover",
+            nargs="+", type=lambda x:x.decode(sys.getfilesystemencoding())),
+        mkarg('-x', '--extract', default=False, action="store_true",
+            help="Recover all content", group="recover"),
         mkarg('-j', '--job', required=True, help="Specifies the job"),
         mkarg('-r', '--rpath', default=None, help="Recover path"),
-        mkarg('-w', '--when', default=None,
-              help="Before date (in dar_managet format)")])
+        mkarg('-i', '--jobid', default=None, depends_on="extract",
+              help="Restores th specified jobid and its dependencies."),
+        mkarg('-w', '--when', default=None, depends_on="file",
+              help="Before date (in dar_manager format)")])
     def do_recover(self, arg, opts=None):
         '''Recover files through dar_manager'''
         cf = getattr(self.cf, opts.job)
@@ -458,9 +465,22 @@ class DardriveApp(CmdApp):
         if bkp_count != dmd_count:
             self.stdout.write("Outdated DMD please rebuild it or recover "
                               "manually.\n")
+            sys.exit(2)
+
+        if opts.extract:
+            cat = opts.jobid if opts.jobid else None
+            try:
+                run = s.recover_all(rpath, stdout=self.stdout, stderr=sys.stderr,
+                    catalog=cat)
+            except RecoverError, e:
+                sys.stderr.write("%s\n" % e.message)
+                sys.exit(2)
         else:
             run = s.recover_from_dmd(opts.file, rpath, when=opts.when)
             self.stdout.write("\n %s \n" % dar_status(run[0].returncode))
+            self.stdout.write("Stdout: %s" % run[1][0])
+            self.stdout.write("Stderr: %s" % run[1][1])
+
 
     @options([
         mkarg('-i', '--id', default=None, help="Limit operation to specified"

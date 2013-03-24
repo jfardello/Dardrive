@@ -26,7 +26,7 @@ class LastRun(object):
     >>> full = s.query(BackupType).get(1)
     >>> inc = s.query(BackupType).get(2)
     >>> s.query(Catalog).delete()
-    11
+    10
     >>> s.query(Stat).delete()
     3
     >>> s.commit()

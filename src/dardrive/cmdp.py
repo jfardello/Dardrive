@@ -1,9 +1,37 @@
 import os
+import sys
 import shlex
 import logging
 from argparse import ArgumentParser, ArgumentError
 from cmd import Cmd
 from excepts import *
+
+
+
+class ParserDepError(Exception): pass
+
+class NestedParser(ArgumentParser):
+    '''Adds a depends_on keyword to the parser that tracks argument dependency.
+    Inspired by http://stackoverflow.com/questions/13788333 '''
+    deps = {}
+
+    def add_argument(self, *args, **kwargs):
+        depends_on = kwargs.pop('depends_on', None)
+        if depends_on:
+            self.deps[args[1].strip("-")] = depends_on
+        return super(NestedParser, self).add_argument(*args, **kwargs)
+
+    def parse_args(self, *args, **kwargs):
+        args = super(NestedParser, self).parse_args(*args, **kwargs)
+        for arg, depends_on in self.deps.iteritems():
+            try:
+                if getattr(args, arg) and not getattr(args, depends_on):
+                    raise ParserDepError(
+                        '--%s depends on the --%s switch' % (arg, depends_on)
+                        )
+            except AttributeError:
+                pass
+        return args
 
 
 def mkarg(*args, **kwargs):
@@ -17,11 +45,29 @@ class options(object):
         self.logger = logging.getLogger(__name__)
         self._wrapped = None
         self.fname = None
+        self.groups = {}
+        self.opt_groups = {}
         if not isinstance(args, list):
             args = [args]
-        self.parser = ArgumentParser()
+        self.parser = NestedParser()
         for argtuple in args:
-            self.parser.add_argument(*argtuple[0], **argtuple[1])
+            #we add an optional "group" keyword to know if we must 
+            #group arguments via argparse.add_mutually_exclusive_group()
+            if argtuple[1].has_key("group"):
+                group = argtuple[1].pop('group')
+                if not self.groups.has_key(group):
+                    self.groups[group]=self.parser\
+                            .add_mutually_exclusive_group(required=True)
+
+                self.groups[group].add_argument(*argtuple[0], **argtuple[1])
+            elif argtuple[1].has_key("opt_group"):
+                group = argtuple[1].pop('opt_group')
+                if not self.opt_groups.has_key(group):
+                    self.opt_groups[group]=self.parser\
+                            .add_mutually_exclusive_group()
+                self.opt_groups[group].add_argument(*argtuple[0], **argtuple[1])
+            else:
+                self.parser.add_argument(*argtuple[0], **argtuple[1])
 
     def _deco(self, instance, args, **kwargs):
         parser_args = shlex.split(args)
@@ -29,6 +75,9 @@ class options(object):
             opts = self.parser.parse_args(parser_args)
             return self._wrapped(instance, args, opts=opts)
         #ArgumentParser likes to exit when arguments don't match..
+        except ParserDepError, e: 
+            instance.stdout.write(" Error:  %s\n" % e.message)
+            sys.exit(2)
         except (ArgumentError, SystemExit), e:
             instance.stdout.write("Unrecognized arguments\n")
         #catch bad jobname definitions
@@ -48,6 +97,9 @@ class options(object):
 
         self.parser.prog = self.fname.replace("do_", "")
         deco.__doc__ = '%s\n%s' % (wrapped.__doc__, self.parser.format_help())
+        for key in self.parser.deps.keys():
+            deco.__doc__ += "\n    --%s depends on the --%s switch\n" %\
+                    (key, self.parser.deps[key])
         return deco
 
 

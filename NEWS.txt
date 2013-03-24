@@ -2,6 +2,12 @@ News
 ====
 
 *Release date: UNRELEASED*
+0.2.11b1
+
+* Fix: The import command now works as expected
+* Fix: recover -f used to fail when recovering large amounts of files
+* recover command adds a new -x switch
+
 
 0.2.10b3
 

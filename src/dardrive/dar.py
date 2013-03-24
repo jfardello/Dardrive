@@ -42,6 +42,18 @@ else:
     db = os.path.expanduser('~/.dardrive/dardrive.db')
     setts = Setts(engine="sqlite:///%s" % db)
 
+def getchilds(elem):
+    if len(elem.child) > 0:
+        return elem.child + getchilds(elem.child[0])
+    else:
+        return []
+
+def getancestors(elem):
+    if elem.parent:
+        return [elem.parent] + getancestors(elem.parent)
+    else:
+        return []
+
 
 class DateShift(object):
     SHIFT = 0
@@ -164,8 +176,7 @@ class Scheme(object):
             return None
 
     def choose(self, force_full):
-        '''Returns a string base, full backups will end in "F" , while
-        Incremental ones will end in I.'''
+        '''Creates and returns a catalog for the default bachup scheme.'''
 
         lastfull = self.get_last(full=True)
         if lastfull is None or (lastfull > self.cf.diffdays) or force_full:
@@ -497,8 +508,10 @@ class Scheme(object):
         else:
             args = command % namedargs
 
-        args = shlex.split(args.encode())
+        self.logger.debug(sys.getfilesystemencoding())
+        args = shlex.split(args.encode(sys.getfilesystemencoding()))
         self.logger.debug(args)
+
         command = subprocess.Popen(args, **commands['popen_defaults'])
         start_time = time.time()
         result = command.communicate()
@@ -673,31 +686,102 @@ class Scheme(object):
 
     def recover_from_dmd(self, path, tmp_path, when=None):
         '''Perform a dar_manager recovery'''
+        if isinstance(path, list):
+            path = " ".join(path)
 
         args = {'dar_manager': self.cf.dar_manager_bin, 'dmd_file': self.dmd,
                 'path': path, 'tmp_path': tmp_path}
-        tpl = "%(dar_manager)s -v -B %(dmd_file)s "
+        tpl = "%(dar_manager)s -B %(dmd_file)s "
+
+        tpl += ' -e "-Q -w -R %(tmp_path)s '
+        if self.cf.encryption:
+            command_file = mk_dar_crypt_file(self.cf.encryption)
+            self.logger.debug('Creating encryption command file %s' %
+                              command_file)
+            tpl += '-B %s ' % command_file
+
+        if not is_admin():
+            tpl += ' --comparison-field=ignore-owner '
+
+        #Close the -e quote.
+        tpl += ' " '
 
         if when:
             tpl += "-w %(when)s "
             args['when'] = when
 
-        tpl += "-Q -e '-w -R %(tmp_path)s "
-        if self.cf.encryption:
-            command_file = mk_dar_crypt_file(self.cf.encryption)
-            self.logger.debug('Creating encryption command file %s' %
-                              command_file)
-            tpl += "-B %s " % command_file
-        if not is_admin():
-            tpl += "--comparison-field=ignore-owner  "
+        tpl += "-Q -r %(path)s "
 
-        tpl += "-Q' -r %(path)s "
+        self.logger.debug(tpl)
         rval = self.run_command(tpl, args)
         if self.cf.encryption and os.path.exists(command_file):
             self.logger.debug('Deleting encryption command file %s' %
                               command_file)
             os.unlink(command_file)
         return rval
+
+    def recover_all(self, rpath, stdout=sys.stdout, stderr=sys.stderr,
+            catalog=None):
+        '''Perform a dar recovery'''
+
+        tpl = "%(dar_bin)s -R %(recover_path)s -w -x %(archive_path)s "
+        q = self.sess.query(Catalog)
+
+        if not catalog:
+            last = q.filter(and_( Catalog.clean,
+                Catalog.job == self.Job,
+                Catalog.type == self.Full
+            )).order_by(Catalog.date.desc()).first()
+            childs = getchilds(last)
+        else:
+            try:
+                last = q.filter_by(id = catalog).one() 
+                childs = getancestors(last)
+            except NoResultFound, e:
+                raise RecoverError("% s is not a valid jobid." % catalog)
+
+        if not is_admin():
+            tpl += "-O ignore-owner "  
+
+        if self.cf.encryption:
+            command_file = mk_dar_crypt_file(self.cf.encryption)
+            self.logger.debug('Creating encryption command file %s' %
+                              command_file)
+            tpl += '-B %s ' % command_file
+        
+        args = {'dar_bin':self.cf.dar_bin, 'recover_path':rpath}
+
+        #If catalog was given, we need to sort the list.
+        all_archives = sorted([last] + childs, key=lambda x:x.date)
+        self.logger.debug("Restoring from: %s" % all_archives)
+        _err = False
+        for arch in all_archives:
+            stdout.write("Recovering %s archive id: %s..\n" %
+                    (arch.type.name, arch.id))
+
+            args['archive_path']=os.path.join(
+                    self.cf.archive_store, self.Job.name, arch.id)
+            run = self.run_command(tpl, args)
+
+            if run[1][0]:
+                stdout.write("Stdout was:\n %s\n" % run[1][0])
+
+            if run[1][1]:
+                stderr.write("Stderr was:\n %s\n" % run[1][1])
+
+            if run[0].returncode > 0:
+                _err = True
+
+        if _err:
+            stderr.write("WARNING, At least one operation returned a non cero" 
+                   " returncode\n")
+
+
+        if self.cf.encryption and os.path.exists(command_file):
+            self.logger.debug('Deleting encryption command file %s' %
+                              command_file)
+            os.unlink(command_file)
+    
 
 
 def dar_move(cmd=None, sect=None):

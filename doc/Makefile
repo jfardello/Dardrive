@@ -38,8 +38,9 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 comm-doc:
-	echo -e "Dardrive commands\n=================\n\n\n" > source/dar_commands.rst
-	./commands.sh
+	@echo -e "Dardrive commands\n=================\n\n\n" > source/dar_commands.rst
+	@echo "Generating source/dar_commands.rst.."
+	@./commands.sh
 
 gh-pages: clean html
 	cd  ../../pages/ && git rm --ignore-unmatch -r . 
