@@ -107,25 +107,59 @@ Examples:
 Recovering files
 ----------------
 
-Recovery operations restores files to the recover_path location, in order to
-recover from the leatest archive::
+In order to recover just one file or directory from the leatest archive in the
+``docs`` job definition to the ``recover_path`` location::
 
-    dardrive recover -f myfile.png -j docs
+    dardrive recover -j docs -f myfile.png 
 
-To recover specific versions a date string in dar's format must be passed with
-the ``-w`` switch, dardrive creates those strings with the versions command::
+You can override the destination of the recovered files with the ``-r`` switch.::
+
+    dardrive recover -j docs -r /tmp -f myfile.png 
+
+To recover specific versions of a given file, a date string in dar's format 
+must be passed with the ``-w`` switch, dardrive reports the dates of a given
+file in that format via the versions command::
 
     dardrive versions -j docs -f myfile.rst 
     2012/10/15-14:08:16
     2012/10/18-12:16:59
     dardrive recover -j docs -f myfile.rst -w "2012/10/18-12:16:59" 
 
+To recover all the content of a backup job (latest Full backup + all
+incremental ones)::
+
+    dardrive recover -j docs -r /tmp -x
+
+While using the ``-x`` switch by default the latest saved content gets restored,
+you can restore previous archives with the ``-i`` switch, if an incremental backup
+chosen, all parent backups will be restored first::
+
+    dardrive show archives -j home 
+     Archive Id                      Job name      Job type             Created   Dar Status
+     5d8ff731f077446a9134c3cd022d0       home   Incremental   19/03/13 23:15:58            0
+     9fd28519f2f342bf8919e3b9ab17a       home   Incremental   19/03/13 22:30:02            0
+     b4e170e8b2b149a6aff99a8910e7f       home          Full   18/03/13 22:30:02            0
+     6375c8a937d04c08a06c995effa29       home          Full   09/03/13 22:30:02            0
+     8d4561836a414479a3621b62a9ed6       home          Full   01/03/13 22:30:01            0
+     2e98ecdffb034a16a77ada0377fb5       home          Full   17/02/13 22:22:52            0
+     1da320a254be4d6690e54b66824a5       home          Full   20/12/12 22:30:02            0
+     12fa211f3b1c4bd59e5c0b80509e0       home          Full   23/11/12 20:45:56            0
+     ce56d4cdcad74c7182c0a12f7bc0c       home          Full   26/10/12 22:30:02            0
+     6460ce7883354a55afa5d7e4e176f       home          Full   29/09/12 22:30:03            0
+
+    dardrive recover -j docs -r /tmp -x -i 5d8ff731f077446a9134c3cd022d0 
+
+
 Note that:
-    * dardrive will restore files or directory trees.
-    * dardrive will add a second to the date string because of the dar_manager
-      logic which restores the latest file before this date.
+    * dardrive recover ``-f`` will restore files or directory trees.
+    * dardrive recover ``-w`` will add a second to the date string because of the
+      dar_manager logic which restores the latest file before this date.
     * a changed inode (in the case of directories) does not explicitly means a
       change on its contents. 
+    * ``recover -f`` relies on dar_manager which is not the best recovery method
+      if you plan to recover thousands of files, quoting its manual page: 
+      - "Its purpose is to simplify the restoration of a set of few files
+      present in many backup, full or differential." -
 
 Getting statistics
 ------------------
@@ -133,8 +167,8 @@ Getting statistics
 Stats are saved for each successfull job, which means dar status 0 and 11, and
 they persist backup rotation.
 
-They can be globaly reseted whith the `reset_stats` command, and displayed by the `show
-stats` command, which may be filtered by job.
+They can be globaly reseted whith the ``reset_stats`` command, and displayed by the ``show
+stats`` command, which may be filtered by job.
 
 
 Email Integration

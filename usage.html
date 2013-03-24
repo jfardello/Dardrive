@@ -188,25 +188,55 @@ will strip the &#8220;slice.extension&#8221; part of a backup, suitable for feed
 </div>
 <div class="section" id="recovering-files">
 <h2>Recovering files<a class="headerlink" href="#recovering-files" title="Permalink to this headline">¶</a></h2>
-<p>Recovery operations restores files to the recover_path location, in order to
-recover from the leatest archive:</p>
-<div class="highlight-python"><pre>dardrive recover -f myfile.png -j docs</pre>
+<p>In order to recover just one file or directory from the leatest archive in the
+<tt class="docutils literal"><span class="pre">docs</span></tt> job definition to the <tt class="docutils literal"><span class="pre">recover_path</span></tt> location:</p>
+<div class="highlight-python"><pre>dardrive recover -j docs -f myfile.png</pre>
 </div>
-<p>To recover specific versions a date string in dar&#8217;s format must be passed with
-the <tt class="docutils literal"><span class="pre">-w</span></tt> switch, dardrive creates those strings with the versions command:</p>
+<p>You can override the destination of the recovered files with the <tt class="docutils literal"><span class="pre">-r</span></tt> switch.:</p>
+<div class="highlight-python"><pre>dardrive recover -j docs -r /tmp -f myfile.png</pre>
+</div>
+<p>To recover specific versions of a given file, a date string in dar&#8217;s format
+must be passed with the <tt class="docutils literal"><span class="pre">-w</span></tt> switch, dardrive reports the dates of a given
+file in that format via the versions command:</p>
 <div class="highlight-python"><pre>dardrive versions -j docs -f myfile.rst
 2012/10/15-14:08:16
 2012/10/18-12:16:59
 dardrive recover -j docs -f myfile.rst -w "2012/10/18-12:16:59"</pre>
 </div>
+<p>To recover all the content of a backup job (latest Full backup + all
+incremental ones):</p>
+<div class="highlight-python"><pre>dardrive recover -j docs -r /tmp -x</pre>
+</div>
+<p>While using the <tt class="docutils literal"><span class="pre">-x</span></tt> switch by default the latest saved content gets restored,
+you can restore previous archives with the <tt class="docutils literal"><span class="pre">-i</span></tt> switch, if an incremental backup
+chosen, all parent backups will be restored first:</p>
+<div class="highlight-python"><pre>dardrive show archives -j home
+ Archive Id                      Job name      Job type             Created   Dar Status
+ 5d8ff731f077446a9134c3cd022d0       home   Incremental   19/03/13 23:15:58            0
+ 9fd28519f2f342bf8919e3b9ab17a       home   Incremental   19/03/13 22:30:02            0
+ b4e170e8b2b149a6aff99a8910e7f       home          Full   18/03/13 22:30:02            0
+ 6375c8a937d04c08a06c995effa29       home          Full   09/03/13 22:30:02            0
+ 8d4561836a414479a3621b62a9ed6       home          Full   01/03/13 22:30:01            0
+ 2e98ecdffb034a16a77ada0377fb5       home          Full   17/02/13 22:22:52            0
+ 1da320a254be4d6690e54b66824a5       home          Full   20/12/12 22:30:02            0
+ 12fa211f3b1c4bd59e5c0b80509e0       home          Full   23/11/12 20:45:56            0
+ ce56d4cdcad74c7182c0a12f7bc0c       home          Full   26/10/12 22:30:02            0
+ 6460ce7883354a55afa5d7e4e176f       home          Full   29/09/12 22:30:03            0
+
+dardrive recover -j docs -r /tmp -x -i 5d8ff731f077446a9134c3cd022d0</pre>
+</div>
 <dl class="docutils">
 <dt>Note that:</dt>
 <dd><ul class="first last simple">
-<li>dardrive will restore files or directory trees.</li>
-<li>dardrive will add a second to the date string because of the dar_manager
-logic which restores the latest file before this date.</li>
+<li>dardrive recover <tt class="docutils literal"><span class="pre">-f</span></tt> will restore files or directory trees.</li>
+<li>dardrive recover <tt class="docutils literal"><span class="pre">-w</span></tt> will add a second to the date string because of the
+dar_manager logic which restores the latest file before this date.</li>
 <li>a changed inode (in the case of directories) does not explicitly means a
 change on its contents.</li>
+<li><tt class="docutils literal"><span class="pre">recover</span> <span class="pre">-f</span></tt> relies on dar_manager which is not the best recovery method
+if you plan to recover thousands of files, quoting its manual page:
+- &#8220;Its purpose is to simplify the restoration of a set of few files
+present in many backup, full or differential.&#8221; -</li>
 </ul>
 </dd>
 </dl>
@@ -215,8 +245,8 @@ change on its contents.</li>
 <h2>Getting statistics<a class="headerlink" href="#getting-statistics" title="Permalink to this headline">¶</a></h2>
 <p>Stats are saved for each successfull job, which means dar status 0 and 11, and
 they persist backup rotation.</p>
-<p>They can be globaly reseted whith the <cite>reset_stats</cite> command, and displayed by the <cite>show
-stats</cite> command, which may be filtered by job.</p>
+<p>They can be globaly reseted whith the <tt class="docutils literal"><span class="pre">reset_stats</span></tt> command, and displayed by the <tt class="docutils literal"><span class="pre">show</span>
+<span class="pre">stats</span></tt> command, which may be filtered by job.</p>
 </div>
 <div class="section" id="email-integration">
 <h2>Email Integration<a class="headerlink" href="#email-integration" title="Permalink to this headline">¶</a></h2>
