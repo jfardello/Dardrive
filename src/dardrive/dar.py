@@ -197,7 +197,6 @@ class Scheme(object):
             self.logger.debug("chose an incremental  backup")
 
         self.sess.add(cat)
-        self.sess.commit()
 
         return cat
 
@@ -532,7 +531,12 @@ class Scheme(object):
         
         self.logger.debug("About to create a catalog..")
         self.newcatalog = self.choose(force_full)
-        lock = self.lock("fs_backup", cat=self.newcatalog)
+        try:
+            lock = self.lock("fs_backup", cat=self.newcatalog)
+        except LockException, e:
+            self.sess.rollback()
+            raise e
+
         self.basename = self.newcatalog.id
         mkdir(self.cf.archive_store, self.section)
         mkdir(self.cf.catalog_store, self.section)
