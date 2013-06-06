@@ -2,7 +2,7 @@ __major__ = 0
 __minor__ = 2
 __extra__ = 11
 __stage__ = "b"
-__pr__ = 11
+__pr__ = 12
 
 __version__ = "%d.%d.%d" % (
         __major__,
