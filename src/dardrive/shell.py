@@ -592,7 +592,11 @@ class DardriveApp(CmdApp):
                             dummy = getattr(sect, opt)
                         except ConfigPasswdException, e:
                             if sys.stdout.isatty():
-                                sect.set(opt, val + getpass())
+                                p1 = getpass()
+                                p2 = getpass('Re-enter password:')
+                                if p1 != p2:
+                                    raise ConfigPasswdException('The given passwords do not match.')
+                                sect.set(opt, val + p1)
                             else:
                                 raise ConfigPasswdException(
                                     'Asking for a '
