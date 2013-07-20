@@ -3,36 +3,69 @@
 #2012, jfardello@uoc.edu
 
 
-class DardriveException(Exception): pass
+class DardriveException(Exception):
+    pass
 
-class CatalogException(DardriveException): pass
 
-class BackupException(DardriveException): pass
+class CatalogException(DardriveException):
+    pass
 
-class RecoverException(BackupException): pass
 
-class BackupDBException(BackupException): pass
+class BackupException(DardriveException):
+    pass
 
-class ImporterExeption(DardriveException): pass
 
-class RefCatalogError(CatalogException): pass
+class RecoverException(BackupException):
+    pass
 
-class ConfigException(Exception): pass
 
-class ConfigValidationException(ConfigException): pass
+class BackupDBException(BackupException):
+    pass
 
-class ConfigPasswdException(ConfigValidationException): pass
 
-class ConfigSectionException(ConfigException): pass
+class ImporterExeption(DardriveException):
+    pass
 
-class ConfigFileException(ConfigValidationException, IOError): pass
 
-class InitException(ConfigException): pass
+class RefCatalogError(CatalogException):
+    pass
 
-class LockException(BackupException): pass
 
-class ParException(DardriveException): pass
+class ConfigException(Exception):
+    pass
 
-class XattrException(DardriveException): pass
 
-class RecoverError(DardriveException): pass
+class ConfigValidationException(ConfigException):
+    pass
+
+
+class ConfigPasswdException(ConfigValidationException):
+    pass
+
+
+class ConfigSectionException(ConfigException):
+    pass
+
+
+class ConfigFileException(ConfigValidationException, IOError):
+    pass
+
+
+class InitException(ConfigException):
+    pass
+
+
+class LockException(BackupException):
+    pass
+
+
+class ParException(DardriveException):
+    pass
+
+
+class XattrException(DardriveException):
+    pass
+
+
+class RecoverError(DardriveException):
+    pass

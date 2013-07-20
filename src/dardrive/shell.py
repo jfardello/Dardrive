@@ -16,7 +16,7 @@ from dar import Scheme, dar_par
 from db import Report, Importer, find_ext, Catalog, Lock, Stat, engine
 from utils import userconfig, DARDRIVE_DEFAULTS, dar_status
 from utils import send_email, reindent, mk_dar_date
-from utils import mk_ssl_auth_file, save_xattr 
+from utils import mk_ssl_auth_file, save_xattr
 from config import Config
 from cmdp import options, CmdApp, mkarg
 from excepts import *
@@ -144,8 +144,8 @@ class DardriveApp(CmdApp):
             self.stdout.write('Arguments needed  (use -h for help)\n')
 
     @options([
-        mkarg('action', 
-            choices=("ver", "jobs", "logs", "archives", "files", "stats"),
+        mkarg('action',
+              choices=("ver", "jobs", "logs", "archives", "files", "stats"),
               default="archives"),
         mkarg('-l', '--long', action='store_true', help="Show job details."),
         mkarg('-j', '--job', help="Filter by job", default=None),
@@ -178,7 +178,7 @@ class DardriveApp(CmdApp):
 
         elif opts.action == "ver":
             ver = pkg_resources.get_distribution("dardrive").version
-            self.stdout.write('\ndardrive %s\n\n'% ver)
+            self.stdout.write('\ndardrive %s\n\n' % ver)
 
         #show stats
         elif opts.action == "stats":
@@ -203,7 +203,7 @@ class DardriveApp(CmdApp):
                         stats(sect)
                     except NoResultFound:
                         self.stdout.write('There\'s no info on %s in the '
-                                      'database.\n' % sect)
+                                          'database.\n' % sect)
 
         # show logs
         elif opts.action == "logs":
@@ -271,7 +271,8 @@ class DardriveApp(CmdApp):
                     dates.append(cat.date.strftime("%d/%m/%y %H:%M:%S"))
                     st = "%s" % cat.status
                     if cat.status is None:
-                        locks = r.s.query(Lock).filter(Lock.cat_id == cat.id).all()
+                        locks = r.s.query(
+                            Lock).filter(Lock.cat_id == cat.id).all()
                         for l in locks:
                             if l.check_pid():
                                 st = "Running"
@@ -399,7 +400,6 @@ class DardriveApp(CmdApp):
         Stat.__table__.drop(engine, checkfirst=True)
         self.stdout.write("Statistics reset.\n")
 
-
     @options([mkarg('-j', '--job', required=True, help="Specifies the job")])
     def do_dumpattr(self, arg, opts=None):
         '''Write extended attributes to every first slice in a job store.'''
@@ -410,10 +410,8 @@ class DardriveApp(CmdApp):
             ct = r.get_catalogs()
             sect = getattr(self.cf, opts.job)
             for each in ct:
-                self.logger.debug("Trying to xattr on %s" % each) 
+                self.logger.debug("Trying to xattr on %s" % each)
                 save_xattr(each, sect)
-
-
 
     @options([
         mkarg('-j', '--job', required=True, help="Specifies the job name.")])
@@ -436,9 +434,9 @@ class DardriveApp(CmdApp):
 
     @options([
         mkarg('-f', '--file', help="Files to recover", group="recover",
-            nargs="+", type=lambda x:x.decode(sys.getfilesystemencoding())),
+              nargs="+", type=lambda x:x.decode(sys.getfilesystemencoding())),
         mkarg('-x', '--extract', default=False, action="store_true",
-            help="Recover all content", group="recover"),
+              help="Recover all content", group="recover"),
         mkarg('-j', '--job', required=True, help="Specifies the job"),
         mkarg('-r', '--rpath', default=None, help="Recover path"),
         mkarg('-i', '--jobid', default=None, depends_on="extract",
@@ -470,7 +468,8 @@ class DardriveApp(CmdApp):
         if opts.extract:
             cat = opts.jobid if opts.jobid else None
             try:
-                run = s.recover_all(rpath, stdout=self.stdout, stderr=sys.stderr,
+                run = s.recover_all(
+                    rpath, stdout=self.stdout, stderr=sys.stderr,
                     catalog=cat)
             except RecoverError, e:
                 sys.stderr.write("%s\n" % e.message)
@@ -480,7 +479,6 @@ class DardriveApp(CmdApp):
             self.stdout.write("\n %s \n" % dar_status(run[0].returncode))
             self.stdout.write("Stdout: %s" % run[1][0])
             self.stdout.write("Stderr: %s" % run[1][1])
-
 
     @options([
         mkarg('-i', '--id', default=None, help="Limit operation to specified"
@@ -547,7 +545,6 @@ class DardriveApp(CmdApp):
             if retcode != 0:
                 sys.stderr.write("Recovery failed with status %s.\n" % retcode)
 
-
     def do_init(self, arg, opts=None):
         '''Creates the user config directory'''
         #actually we only need the docstring, as it is handled in shell.main()
@@ -595,7 +592,8 @@ class DardriveApp(CmdApp):
                                 p1 = getpass()
                                 p2 = getpass('Re-enter password:')
                                 if p1 != p2:
-                                    raise ConfigPasswdException('The given passwords do not match.')
+                                    raise ConfigPasswdException(
+                                        'The given passwords do not match.')
                                 sect.set(opt, val + p1)
                             else:
                                 raise ConfigPasswdException(
@@ -615,7 +613,6 @@ class DardriveApp(CmdApp):
         else:
             sys.stderr.write('Unexistent job\n')
             sys.exit(1)
-
 
     def do_ls(self, arg, opts=None):
         return self.do_help(arg)

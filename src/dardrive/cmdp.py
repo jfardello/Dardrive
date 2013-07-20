@@ -7,8 +7,9 @@ from cmd import Cmd
 from excepts import *
 
 
+class ParserDepError(Exception):
+    pass
 
-class ParserDepError(Exception): pass
 
 class NestedParser(ArgumentParser):
     '''Adds a depends_on keyword to the parser that tracks argument dependency.
@@ -28,7 +29,7 @@ class NestedParser(ArgumentParser):
                 if getattr(args, arg) and not getattr(args, depends_on):
                     raise ParserDepError(
                         '--%s depends on the --%s switch' % (arg, depends_on)
-                        )
+                    )
             except AttributeError:
                 pass
         return args
@@ -51,21 +52,22 @@ class options(object):
             args = [args]
         self.parser = NestedParser()
         for argtuple in args:
-            #we add an optional "group" keyword to know if we must 
+            #we add an optional "group" keyword to know if we must
             #group arguments via argparse.add_mutually_exclusive_group()
-            if argtuple[1].has_key("group"):
+            if "group" in argtuple[1]:
                 group = argtuple[1].pop('group')
-                if not self.groups.has_key(group):
-                    self.groups[group]=self.parser\
-                            .add_mutually_exclusive_group(required=True)
+                if group not in self.groups:
+                    self.groups[group] = self.parser\
+                        .add_mutually_exclusive_group(required=True)
 
                 self.groups[group].add_argument(*argtuple[0], **argtuple[1])
-            elif argtuple[1].has_key("opt_group"):
+            elif "opt_group" in argtuple[1]:
                 group = argtuple[1].pop('opt_group')
-                if not self.opt_groups.has_key(group):
-                    self.opt_groups[group]=self.parser\
-                            .add_mutually_exclusive_group()
-                self.opt_groups[group].add_argument(*argtuple[0], **argtuple[1])
+                if group not in self.opt_groups:
+                    self.opt_groups[group] = self.parser\
+                        .add_mutually_exclusive_group()
+                self.opt_groups[group].add_argument(
+                    *argtuple[0], **argtuple[1])
             else:
                 self.parser.add_argument(*argtuple[0], **argtuple[1])
 
@@ -75,7 +77,7 @@ class options(object):
             opts = self.parser.parse_args(parser_args)
             return self._wrapped(instance, args, opts=opts)
         #ArgumentParser likes to exit when arguments don't match..
-        except ParserDepError, e: 
+        except ParserDepError, e:
             instance.stdout.write(" Error:  %s\n" % e.message)
             sys.exit(2)
         except (ArgumentError, SystemExit), e:
@@ -99,7 +101,7 @@ class options(object):
         deco.__doc__ = '%s\n%s' % (wrapped.__doc__, self.parser.format_help())
         for key in self.parser.deps.keys():
             deco.__doc__ += "\n    --%s depends on the --%s switch\n" %\
-                    (key, self.parser.deps[key])
+                (key, self.parser.deps[key])
         return deco
 
 

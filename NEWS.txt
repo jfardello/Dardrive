@@ -2,7 +2,16 @@ News
 ====
 
 *Release date: UNRELEASED*
+
+0.2.11b13
+---------
+
+* Fixed orphan catalogs bug.
+* Ask the user to confirm passwords (thanks @jayme-github)
+
+
 0.2.11b1
+--------
 
 * Fix: The import command now works as expected
 * Fix: recover -f used to fail when recovering large amounts of files
@@ -10,10 +19,12 @@ News
 
 
 0.2.10b3
+--------
 
 * Bugfix to the purge routine.
 
 0.2.10b2
+--------
 
 * Stats are preserved from rotation
 * There's a command to reset stats
@@ -21,6 +32,7 @@ News
 * Fix: It is now possible to show stats while a backup is running. 
 
 0.2.10b1
+--------
 
 * The "show archive" code now correctly displays the time.
 * archive_store and catalog_store are now validated, and report an error.
@@ -36,7 +48,7 @@ News
 
 
 0.2.9b2
------
+-------
 
 
 * Initial GH import! (http://github.com/jfardello/dardrive)

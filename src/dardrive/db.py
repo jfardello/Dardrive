@@ -50,6 +50,7 @@ def find_ext(btype):
             return ext
     raise Exception("Extension not found.")
 
+
 class Stat(Base):
     __tablename__ = "stats"
     id = Column(String, primary_key=True, default=mkid)
@@ -59,7 +60,6 @@ class Stat(Base):
     type = relationship("BackupType")
     date = Column(DateTime, default=datetime.now)
     ttook = Column(Integer, nullable=True)
-
 
 
 class Catalog(Base):
@@ -95,6 +95,7 @@ class Catalog(Base):
 
     def __repr__(self):
         return "<%s:%s>" % (self.__class__.__name__, self.id)
+
 
 class BackupType(Base):
     __tablename__ = "types"
@@ -178,6 +179,7 @@ def get_or_create(model, sess, **kwargs):
         logger.debug("created: %s" % instance)
     return instance
 
+
 def save_stats(ins, s):
     '''Saves time statistics.'''
     logger = logging.getLogger("db.save_stats")
@@ -187,7 +189,7 @@ def save_stats(ins, s):
             c = s.query(Stat).filter_by(id=ins.id).first()
             if not c:
                 c = Stat(id=ins.id, job=ins.job, type=ins.type,
-                    date=ins.date, ttook=ins.ttook)
+                         date=ins.date, ttook=ins.ttook)
                 s.add(c)
                 logger.debug("Stats saved for %s" % c.id)
 

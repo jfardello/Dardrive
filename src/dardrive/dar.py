@@ -42,11 +42,13 @@ else:
     db = os.path.expanduser('~/.dardrive/dardrive.db')
     setts = Setts(engine="sqlite:///%s" % db)
 
+
 def getchilds(elem):
     if len(elem.child) > 0:
         return elem.child + getchilds(elem.child[0])
     else:
         return []
+
 
 def getancestors(elem):
     if elem.parent:
@@ -125,8 +127,6 @@ class Scheme(object):
         create_all(engine)
         Sess = sessionmaker(bind=engine)
         self.sess = Sess(bind=engine)
-
-
 
         #init dardrive backup types
         for btype, ext in dardrive_types:
@@ -275,7 +275,7 @@ class Scheme(object):
         if hierarchy == 1:
             #month overload
             if cat.date.month == 12:
-                period = datetime.date(cat.date.year + 1 ,  1, 1)
+                period = datetime.date(cat.date.year + 1, 1, 1)
             else:
                 period = datetime.date(cat.date.year, cat.date.month + 1, 1)
             del_cond = self.dt.today() - datetime.timedelta(days=30)
@@ -527,8 +527,8 @@ class Scheme(object):
         real backup archive.'''
         if os.path.samefile(self.cf.archive_store, self.cf.catalog_store):
             raise ConfigException("archive_store and catalog_store must be"
-                    " different directories.")
-        
+                                  " different directories.")
+
         self.logger.debug("About to create a catalog..")
         self.newcatalog = self.choose(force_full)
         try:
@@ -725,46 +725,46 @@ class Scheme(object):
         return rval
 
     def recover_all(self, rpath, stdout=sys.stdout, stderr=sys.stderr,
-            catalog=None):
+                    catalog=None):
         '''Perform a dar recovery'''
 
         tpl = "%(dar_bin)s -R %(recover_path)s -w -x %(archive_path)s "
         q = self.sess.query(Catalog)
 
         if not catalog:
-            last = q.filter(and_( Catalog.clean,
-                Catalog.job == self.Job,
-                Catalog.type == self.Full
-            )).order_by(Catalog.date.desc()).first()
+            last = q.filter(and_(Catalog.clean,
+                                 Catalog.job == self.Job,
+                                 Catalog.type == self.Full
+                                 )).order_by(Catalog.date.desc()).first()
             childs = getchilds(last)
         else:
             try:
-                last = q.filter_by(id = catalog).one() 
+                last = q.filter_by(id=catalog).one()
                 childs = getancestors(last)
             except NoResultFound, e:
                 raise RecoverError("% s is not a valid jobid." % catalog)
 
         if not is_admin():
-            tpl += "-O ignore-owner "  
+            tpl += "-O ignore-owner "
 
         if self.cf.encryption:
             command_file = mk_dar_crypt_file(self.cf.encryption)
             self.logger.debug('Creating encryption command file %s' %
                               command_file)
             tpl += '-B %s ' % command_file
-        
-        args = {'dar_bin':self.cf.dar_bin, 'recover_path':rpath}
+
+        args = {'dar_bin': self.cf.dar_bin, 'recover_path': rpath}
 
         #If catalog was given, we need to sort the list.
-        all_archives = sorted([last] + childs, key=lambda x:x.date)
+        all_archives = sorted([last] + childs, key=lambda x: x.date)
         self.logger.debug("Restoring from: %s" % all_archives)
         _err = False
         for arch in all_archives:
             stdout.write("Recovering %s archive id: %s..\n" %
-                    (arch.type.name, arch.id))
+                         (arch.type.name, arch.id))
 
-            args['archive_path']=os.path.join(
-                    self.cf.archive_store, self.Job.name, arch.id)
+            args['archive_path'] = os.path.join(
+                self.cf.archive_store, self.Job.name, arch.id)
             run = self.run_command(tpl, args)
 
             if run[1][0]:
@@ -777,15 +777,13 @@ class Scheme(object):
                 _err = True
 
         if _err:
-            stderr.write("WARNING, At least one operation returned a non cero" 
-                   " returncode\n")
-
+            stderr.write("WARNING, At least one operation returned a non cero"
+                         " returncode\n")
 
         if self.cf.encryption and os.path.exists(command_file):
             self.logger.debug('Deleting encryption command file %s' %
                               command_file)
             os.unlink(command_file)
-    
 
 
 def dar_move(cmd=None, sect=None):
